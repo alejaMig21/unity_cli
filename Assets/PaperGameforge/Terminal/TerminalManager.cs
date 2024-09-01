@@ -94,14 +94,6 @@ namespace Assets.PaperGameforge.Terminal
                 child.CreateTextInfo(GetCurrentRenderedDirectory(), userInput);
             }
         }
-        private static void AdjustDirectory(GameObject msg)
-        {
-            var directories = msg.GetComponentsInChildren<DirectoryTextUGUI>();
-            foreach (var directory in directories)
-            {
-                directory.Adjust();
-            }
-        }
         private int AddInterpreterLines(List<string> interpretation)
         {
             for (int i = 0; i < interpretation.Count; i++)

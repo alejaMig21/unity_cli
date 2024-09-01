@@ -26,10 +26,8 @@ namespace Assets.PaperGameforge.Terminal
         #region CONSTANTS
         private const string CHANGE_DIR_COMMAND = "cd";
         private const string PREVIOUS_DIR_COMMAND = "..";
-        private const string ASCII_CONST = "ASCII";
         private const string METHOD_CONST = "METHOD";
         private const string INFO_CONST = "INFO";
-        private const string CLEAR_CONST = "CLEAR";
         private const string ASCII_TITLE_ASSET = "ascii.txt";
         private const string ERROR_DIR_COMMAND = "ERROR DIR_NOT_FOUND";
         #endregion
@@ -126,19 +124,6 @@ namespace Assets.PaperGameforge.Terminal
 
             return (false, _FileManager.Path); // Returns the current path
         }
-        private void ExecuteMethodCommand(string method)
-        {
-            switch (method)
-            {
-                case ASCII_CONST:
-                    //LoadTitle();
-                    GetType().GetMethod("LoadTitle").Invoke(this, new object[0]);
-                    break;
-                case CLEAR_CONST:
-                    OnClearStart?.Invoke();
-                    break;
-            }
-        }
         public string ColorString(string s, string color)
         {
             string leftTag = "<color=" + color + ">";
@@ -149,10 +134,6 @@ namespace Assets.PaperGameforge.Terminal
         private void ListEntry(string a, string b)
         {
             responses.Add(ColorString(a, colors["orange"]) + ": " + ColorString(b, colors["yellow"]));
-        }
-        public void LoadTitle()
-        {
-            LoadAscii(ASCII_TITLE_ASSET, "red", 2);
         }
         private void LoadAscii(string path, string color, int spacing)
         {
@@ -183,6 +164,22 @@ namespace Assets.PaperGameforge.Terminal
             }
             return _FileManager.MoveToPreviousDirectory();
         }
+
+        #region EXTERNALLY CALLED METHODS
+        private void ExecuteMethodCommand(string method)
+        {
+            GetType().GetMethod(method).Invoke(this, new object[0]);
+        }
+        public void LoadTitle()
+        {
+            LoadAscii(ASCII_TITLE_ASSET, "red", 2);
+        }
+        public void Clear()
+        {
+            OnClearStart?.Invoke();
+        }
+        #endregion
+
         #endregion
     }
 }

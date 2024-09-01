@@ -2,16 +2,16 @@
 help,,,,,,,,,,,,,,,,,,"If you want to use the terminal, type 'boop'"
 ,,,,,,,,,,,,,,,,,,This is the second line that we are returning
 ,,,,,,,,,,,,,,,,,,And of course this is the third one…
-,,,,,,,,,,,,,,,,,,METHOD:ASCII
+,,,,,,,,,,,,,,,,,,METHOD:LoadTitle
 ,info,,,,,,,,,,,,,,,,,INFO:returns a list of commands
 ,software,,,,,,,,,,,,,,,,,This tool is an integrated terminal for Unity games.
 ,settings,,,,,,,,,,,,,,,,,Here you can see descriptions of the game settings
 ,,,,,,,,,,,,,,,,,,Try asking for graphics
 ,,graphics,,,,,,,,,,,,,,,,Here you can select different graphics presets
-ascii,,,,,,,,,,,,,,,,,,METHOD:ASCII
+ascii,,,,,,,,,,,,,,,,,,METHOD:LoadTitle
 ,,,,,,,,,,,,,,,,,,
 ,,,,,,,,,,,,,,,,,,
 ERROR,,,,,,,,,,,,,,,,,,Somethig went wrong
 ,NOT_FOUND,,,,,,,,,,,,,,,,,Command not recognized. Type help for a list of commands
 ,DIR_NOT_FOUND,,,,,,,,,,,,,,,,,Directory not found
-clear,,,,,,,,,,,,,,,,,,METHOD:CLEAR
+clear,,,,,,,,,,,,,,,,,,METHOD:Clear
