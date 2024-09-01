@@ -1,0 +1,9 @@
+1-Mejorar la manera en la que el interprete determina si usar un procesado de comando o de directorio.
+2-Lanzar error cuando no se encuentre un directorio.
+3-Poder viajar hacia comandos previos y posteriores con las flechas de direccion.
+4-Listar directorios dentro de una carpeta.
+5-Poder copiar y pegar directorios.
+6-Poder escribir en el CSV de los comandos de la terminal.
+7-Poder "instalar" paquetes (se escrbiran nuevas celdas en el CSV).
+8-Poder crear entornos virtuales (sera crear nuevos CSV en blanco).
+9-Optimizar las busquedas dentro del CSV (usar un arbol).

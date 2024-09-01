@@ -1,0 +1,17 @@
+﻿Key,Arg_1,Arg_2,Arg_3,Arg_4,Arg_5,Arg_6,Arg_7,Arg_8,Arg_9,Arg_10,Arg_11,Arg_12,Arg_13,Arg_14,Arg_15,Arg_16,Arg_17,Response
+help,,,,,,,,,,,,,,,,,,"If you want to use the terminal, type 'boop'"
+,,,,,,,,,,,,,,,,,,This is the second line that we are returning
+,,,,,,,,,,,,,,,,,,And of course this is the third one…
+,,,,,,,,,,,,,,,,,,METHOD:ASCII
+,info,,,,,,,,,,,,,,,,,INFO:returns a list of commands
+,software,,,,,,,,,,,,,,,,,This tool is an integrated terminal for Unity games.
+,settings,,,,,,,,,,,,,,,,,Here you can see descriptions of the game settings
+,,,,,,,,,,,,,,,,,,Try asking for graphics
+,,graphics,,,,,,,,,,,,,,,,Here you can select different graphics presets
+ascii,,,,,,,,,,,,,,,,,,METHOD:ASCII
+,,,,,,,,,,,,,,,,,,
+,,,,,,,,,,,,,,,,,,
+ERROR,,,,,,,,,,,,,,,,,,Somethig went wrong
+,NOT_FOUND,,,,,,,,,,,,,,,,,Command not recognized. Type help for a list of commands
+,DIR_NOT_FOUND,,,,,,,,,,,,,,,,,Directory not found
+clear,,,,,,,,,,,,,,,,,,METHOD:CLEAR

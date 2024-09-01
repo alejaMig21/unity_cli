@@ -1,0 +1,4 @@
+UnityPackage -> NuGetForUnity.4.1.1
+	repo: https://github.com/GlitchEnzo/NuGetForUnity/releases/tag/v4.1.1
+
+Dependency -> CsvHelper
