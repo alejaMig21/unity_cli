@@ -5,3 +5,5 @@
 5-Poder "instalar" paquetes (se escrbiran nuevas celdas en el CSV).
 6-Poder crear entornos virtuales (sera crear nuevos CSV en blanco).
 7-Optimizar las busquedas dentro del CSV (usar un arbol).
+8-Preparar la terminal para lidiar con archivos cuyo directorio tiene denegada la inspeccion.
+9-Optimizar la terminal (si se hacen muchas request los gameObjects comienzan a limitar el rendimiento)

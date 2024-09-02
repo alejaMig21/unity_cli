@@ -31,6 +31,8 @@ namespace Assets.PaperGameforge.Terminal
         private const string INFO_CONST = "INFO";
         private const string ASCII_TITLE_ASSET = "ascii.txt";
         private const string ERROR_DIR_COMMAND = "ERROR DIR_NOT_FOUND";
+        private const char TWO_DOTS_SEPARATOR = ':';
+        private const char WHITE_SAPACE_SEPARATOR = ' ';
         #endregion
 
         #region EVENTS
@@ -83,7 +85,7 @@ namespace Assets.PaperGameforge.Terminal
         }
         private void ProcessResponse(string response, string userInput = null)
         {
-            string[] args = response.Split(':');
+            string[] args = response.Split(TWO_DOTS_SEPARATOR);
 
             if (args.Length > 1)
             {
@@ -107,12 +109,12 @@ namespace Assets.PaperGameforge.Terminal
         }
         private (bool error, string response) TryProcessDirectoryRequest(string userInput)
         {
-            string[] dirArgs = userInput.Split(' ');
+            string[] dirArgs = userInput.Split(WHITE_SAPACE_SEPARATOR);
 
             if (dirArgs[0] == CHANGE_DIR_COMMAND)
             {
                 // Join all arguments after the command into a single string for the directory
-                string dir = string.Join(' ', dirArgs.Skip(1));
+                string dir = string.Join(WHITE_SAPACE_SEPARATOR, dirArgs.Skip(1));
 
                 (bool exists, string newPath) = ChangeDirectory(dir);
 
