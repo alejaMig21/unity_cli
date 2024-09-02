@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using UnityEngine;
 
 namespace Assets.PaperGameforge.Terminal
@@ -84,12 +85,6 @@ namespace Assets.PaperGameforge.Terminal
         {
             string[] args = response.Split(':');
 
-            try
-            {
-                Debug.Log(args[0] + ", " + args[1]);
-            }
-            catch (Exception e) { }
-
             if (args.Length > 1)
             {
                 string commandType = args[0];
@@ -114,9 +109,10 @@ namespace Assets.PaperGameforge.Terminal
         {
             string[] dirArgs = userInput.Split(' ');
 
-            if (dirArgs.Length == 2 && dirArgs[0] == CHANGE_DIR_COMMAND)
+            if (dirArgs[0] == CHANGE_DIR_COMMAND)
             {
-                string dir = dirArgs[1];
+                // Join all arguments after the command into a single string for the directory
+                string dir = string.Join(' ', dirArgs.Skip(1));
 
                 (bool exists, string newPath) = ChangeDirectory(dir);
 
