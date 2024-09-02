@@ -15,3 +15,6 @@ ERROR,,,,,,,,,,,,,,,,,,Somethig went wrong
 ,NOT_FOUND,,,,,,,,,,,,,,,,,Command not recognized. Type help for a list of commands
 ,DIR_NOT_FOUND,,,,,,,,,,,,,,,,,Directory not found
 clear,,,,,,,,,,,,,,,,,,METHOD:Clear
+cd,,,,,,,,,,,,,,,,,,
+,dir,,,,,,,,,,,,,,,,,
+,,all,,,,,,,,,,,,,,,,METHOD:LoadDirectories

@@ -84,6 +84,12 @@ namespace Assets.PaperGameforge.Terminal
         {
             string[] args = response.Split(':');
 
+            try
+            {
+                Debug.Log(args[0] + ", " + args[1]);
+            }
+            catch (Exception e) { }
+
             if (args.Length > 1)
             {
                 string commandType = args[0];
@@ -177,6 +183,11 @@ namespace Assets.PaperGameforge.Terminal
         public void Clear()
         {
             OnClearStart?.Invoke();
+        }
+        public void LoadDirectories()
+        {
+            responses.Clear();
+            responses.AddRange(_FileManager.LoadDirData());
         }
         #endregion
 

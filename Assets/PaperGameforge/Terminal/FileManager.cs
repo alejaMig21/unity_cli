@@ -13,6 +13,10 @@ namespace Assets.PaperGameforge.Terminal
         [SerializeField] private DirectoryTextUGUI dirText;
         #endregion
 
+        #region CONSTANTS
+        private const string WHITE_SPACE = "   ";
+        #endregion
+
         #region PROPERTIES
         public string Path
         {
@@ -61,7 +65,8 @@ namespace Assets.PaperGameforge.Terminal
             foreach (string dir in pathInfo)
             {
                 DirectoryInfo info = new(dir);
-                foundDirectories.Add(info.FullName);
+                string directoryPath = WHITE_SPACE + info.FullName.Replace(@"\", @"\\");
+                foundDirectories.Add(directoryPath);
             }
 
             return foundDirectories;
@@ -69,7 +74,6 @@ namespace Assets.PaperGameforge.Terminal
         private bool CheckDirExistence(string fullDirName)
         {
             string newPath = fullDirName;
-            Debug.Log(newPath + " exists? " + Directory.Exists(newPath));
             return Directory.Exists(newPath);
         }
         public (bool exists, string newPath) MoveToDirectory(string folderName)
@@ -87,9 +91,14 @@ namespace Assets.PaperGameforge.Terminal
         {
             DirectoryInfo info = Directory.GetParent(path);
 
+            if (info == null)
+            {
+                return (false, path);
+            }
+
             bool exists = CheckDirExistence(info.FullName);
 
-            if (info != null && exists)
+            if (exists)
             {
                 Path = info.FullName;
             }
