@@ -52,11 +52,19 @@ namespace Assets.PaperGameforge.Terminal
         {
             directories.Clear();
 
-            directories.AddRange(GetDirectories(Directory.GetDirectories(Path)));
+            directories.AddRange(LoadFolders());
 
-            directories.AddRange(GetDirectories(Directory.GetFiles(Path)));
+            directories.AddRange(LoadFiles());
 
             return directories;
+        }
+        public List<string> LoadFolders()
+        {
+            return GetDirectories(Directory.GetDirectories(Path));
+        }
+        public List<string> LoadFiles()
+        {
+            return GetDirectories(Directory.GetFiles(Path));
         }
         private List<string> GetDirectories(string[] pathInfo)
         {

@@ -189,6 +189,11 @@ namespace Assets.PaperGameforge.Terminal
             responses.Clear();
             responses.AddRange(_FileManager.LoadDirData());
         }
+        public void LoadFolders()
+        {
+            responses.Clear();
+            responses.AddRange(_FileManager.LoadFolders());
+        }
         #endregion
 
         #endregion

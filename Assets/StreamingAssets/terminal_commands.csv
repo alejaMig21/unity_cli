@@ -16,5 +16,5 @@ ERROR,,,,,,,,,,,,,,,,,,Somethig went wrong
 ,DIR_NOT_FOUND,,,,,,,,,,,,,,,,,Directory not found
 clear,,,,,,,,,,,,,,,,,,METHOD:Clear
 cd,,,,,,,,,,,,,,,,,,
-,dir,,,,,,,,,,,,,,,,,
+,dir,,,,,,,,,,,,,,,,,METHOD:LoadFolders
 ,,all,,,,,,,,,,,,,,,,METHOD:LoadDirectories

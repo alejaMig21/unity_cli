@@ -40,7 +40,7 @@ namespace Assets.PaperGameforge.Terminal
         #region METHODS
         private void Awake()
         {
-            //AddInterpreterLines(_Interpreter.Interpret("ascii"));
+            AddInterpreterLines(_Interpreter.Interpret("ascii"));
             // Move the user input line to the end.
             userInputLine.transform.SetAsLastSibling();
             _Interpreter.OnClearStart += ClearTerminal;
