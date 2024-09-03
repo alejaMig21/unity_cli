@@ -4,7 +4,7 @@ using UnityEngine;
 namespace Assets.PaperGameforge.Terminal.TEST
 {
     [CreateAssetMenu(fileName = "TextFormatterService", menuName = "TerminalServices/ResponseServices/TextFormatterService")]
-    public class TextFormatterService : ResponseService
+    public class TextFormatterService : DecoratorService
     {
         private Dictionary<string, string> colors = new()
         {
@@ -18,10 +18,6 @@ namespace Assets.PaperGameforge.Terminal.TEST
         };
         public Dictionary<string, string> Colors { get => colors; set => colors = value; }
 
-        public override List<string> ParseResponse(List<string> responses)
-        {
-            throw new System.NotImplementedException();
-        }
         public string ColorString(string s, string color)
         {
             string leftTag = "<color=" + color + ">";
@@ -29,9 +25,16 @@ namespace Assets.PaperGameforge.Terminal.TEST
 
             return leftTag + s + rightTag;
         }
-        public List<string> ListEntry(string a, string b)
+        public List<string> ListEntry(string header, string headerColor, List<string> textsToDecorate, string bodyColor)
         {
-            return new List<string>() { ColorString(a, Colors["orange"]) + ": " + ColorString(b, Colors["yellow"]) };
+            List<string> decoratedTexts = new();
+
+            foreach (string s in textsToDecorate)
+            {
+                decoratedTexts.Add(ColorString(header, headerColor) + ": " + ColorString(s, bodyColor));
+            }
+
+            return decoratedTexts;
         }
     }
 }

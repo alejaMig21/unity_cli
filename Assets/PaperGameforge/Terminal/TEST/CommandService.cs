@@ -8,7 +8,14 @@ namespace Assets.PaperGameforge.Terminal.TEST
     {
         public override (bool, List<string>) Execute(string userInput)
         {
-            return CommandsReader.GetResponses(userInput);
+            var (cmd_error, commandResponses) = CommandsReader.GetResponses(userInput);
+
+            if (commandResponses == null)
+            {
+                commandResponses = new();
+            }
+
+            return (cmd_error, commandResponses); // Interpretación exitosa
         }
     }
 }

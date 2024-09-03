@@ -1,20 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
 namespace Assets.PaperGameforge.Terminal.TEST
 {
     [CreateAssetMenu(fileName = "CleanerService", menuName = "TerminalServices/InterpreterServices/CleanerService")]
-    public class CleanerService : InterpreterService
+    public class CleanerService : DecoratorService
     {
         #region EVENTS
-        public event Action OnClearStart;
+        public event System.Action OnClearStart;
         #endregion
 
-        public override (bool, List<string>) Execute(string userInput)
-        {
-            throw new System.NotImplementedException();
-        }
         public void Clear()
         {
             OnClearStart?.Invoke();

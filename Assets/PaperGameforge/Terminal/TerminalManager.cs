@@ -48,6 +48,7 @@ namespace Assets.PaperGameforge.Terminal
                 if (service is CleanerService)
                 {
                     (service as CleanerService).OnClearStart += ClearTerminal;
+                    break;
                 }
             }
         }

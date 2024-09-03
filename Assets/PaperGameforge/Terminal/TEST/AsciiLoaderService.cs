@@ -5,29 +5,20 @@ using UnityEngine;
 namespace Assets.PaperGameforge.Terminal.TEST
 {
     [CreateAssetMenu(fileName = "AsciiLoaderService", menuName = "TerminalServices/InterpreterServices/AsciiLoaderService")]
-    public class AsciiLoaderService : InterpreterService
+    public class AsciiLoaderService : DecoratorService
     {
         private const string ASCII_TITLE_ASSET = "ascii.txt";
-        private TextFormatterService textFormatterService;
+        private const int SPACING = 1;
 
-        public void SetUpValues(TextFormatterService textFormatterService)
-        {
-            this.textFormatterService = textFormatterService;
-        }
-
-        public override (bool, List<string>) Execute(string userInput)
-        {
-            throw new System.NotImplementedException();
-        }
         public List<string> LoadTitle()
         {
-            return LoadAscii(ASCII_TITLE_ASSET, "red", 2);
+            return LoadAscii(ASCII_TITLE_ASSET, SPACING);
         }
-        private List<string> LoadAscii(string path, string color, int spacing)
+        private List<string> LoadAscii(string fileName, int spacing)
         {
             List<string> responses = new();
 
-            StreamReader file = new(Path.Combine(Application.streamingAssetsPath, path));
+            StreamReader file = new(Path.Combine(UnityEngine.Application.streamingAssetsPath, fileName));
 
             for (int i = 0; i < spacing; i++)
             {
@@ -36,7 +27,7 @@ namespace Assets.PaperGameforge.Terminal.TEST
 
             while (!file.EndOfStream)
             {
-                responses.Add(textFormatterService.ColorString(file.ReadLine(), textFormatterService.Colors[color]));
+                responses.Add(file.ReadLine());
             }
 
             for (int i = 0; i < spacing; i++)

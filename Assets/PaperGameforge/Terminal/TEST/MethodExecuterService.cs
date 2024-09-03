@@ -4,13 +4,34 @@ using UnityEngine;
 namespace Assets.PaperGameforge.Terminal.TEST
 {
     [CreateAssetMenu(fileName = "MethodExecuterService", menuName = "TerminalServices/InterpreterServices/MethodExecuterService")]
-    public class MethodExecuterService : InterpreterService
+    public class MethodExecuterService : DecoratorService
     {
-        public override (bool, List<string>) Execute(string userInput)
+        private const string I_METHOD_CONST = "IMETHOD";
+        private List<ITerminalService> services = new();
+
+        public void SetUpValues(List<ITerminalService> services)
         {
-            throw new System.NotImplementedException();
+            this.services = services;
         }
-        public List<string> ExecuteMethodCommand(string method, List<ITerminalService> services)
+
+        public override (bool, List<string>) ProcessResponse(string response, string userInput = null)
+        {
+            string[] args = response.Split(TWO_DOTS_SEPARATOR);
+
+            if (args.Length > 1)
+            {
+                string commandType = args[0];
+                string commandParam = args[1];
+
+                if (commandType.Equals(I_METHOD_CONST) || commandType.Equals(D_METHOD_CONST))
+                {
+                    return ExecuteMethodCommand(commandParam, services);
+                }
+            }
+
+            return (true, null);
+        }
+        public (bool, List<string>) ExecuteMethodCommand(string method, List<ITerminalService> services)
         {
             List<string> responses = new();
 
@@ -34,11 +55,11 @@ namespace Assets.PaperGameforge.Terminal.TEST
                         responses.AddRange(stringList);
                     }
 
-                    break;
+                    return (false, responses);
                 }
             }
 
-            return responses;
+            return (true, responses);
         }
     }
 }

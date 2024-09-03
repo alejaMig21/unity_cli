@@ -1956,22 +1956,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 50e5ce586fa8a5d48a7a91b30dd01f07, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  commandService: {fileID: 11400000, guid: 3b0a5087cfbd9b3439065643babbffbb, type: 2}
-  directoryService: {fileID: 11400000, guid: b7acee9f2dda01b4c9543e83d264a7bd, type: 2}
-  textFormatterService: {fileID: 11400000, guid: fd48cba8d151e4f449957813617acd0a, type: 2}
-  asciiLoaderService: {fileID: 11400000, guid: 8573132aa48399147b844a571b0ef8c2, type: 2}
-  cleanerService: {fileID: 11400000, guid: 5c88e6b5a09abaa4d9576b66428711a1, type: 2}
-  methodExecuterService: {fileID: 11400000, guid: 196a7814e12a0c2449c2c5f6c0f4dff6, type: 2}
-  informationService: {fileID: 11400000, guid: 8da012df61be9a545bda67aac8a595d4, type: 2}
   interpreterServices:
-  - {fileID: 11400000, guid: 8573132aa48399147b844a571b0ef8c2, type: 2}
-  - {fileID: 11400000, guid: 5c88e6b5a09abaa4d9576b66428711a1, type: 2}
   - {fileID: 11400000, guid: 3b0a5087cfbd9b3439065643babbffbb, type: 2}
   - {fileID: 11400000, guid: b7acee9f2dda01b4c9543e83d264a7bd, type: 2}
+  decoratorServices:
+  - {fileID: 11400000, guid: 8573132aa48399147b844a571b0ef8c2, type: 2}
+  - {fileID: 11400000, guid: 5c88e6b5a09abaa4d9576b66428711a1, type: 2}
   - {fileID: 11400000, guid: 196a7814e12a0c2449c2c5f6c0f4dff6, type: 2}
-  responseServices:
-  - {fileID: 11400000, guid: fd48cba8d151e4f449957813617acd0a, type: 2}
-  - {fileID: 11400000, guid: 8da012df61be9a545bda67aac8a595d4, type: 2}
 --- !u!114 &1103903315
 MonoBehaviour:
   m_ObjectHideFlags: 0

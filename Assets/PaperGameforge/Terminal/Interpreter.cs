@@ -9,23 +9,10 @@ namespace Assets.PaperGameforge.Terminal
     {
         #region FIELDS
         private List<string> responses = new();
+        private List<string> decoratedResponses = new();
         private FileManager fileManager;
-        [SerializeField] private CommandService commandService;
-        [SerializeField] private DirectoryService directoryService;
-        [SerializeField] private TextFormatterService textFormatterService;
-        [SerializeField] private AsciiLoaderService asciiLoaderService;
-        [SerializeField] private CleanerService cleanerService;
-        [SerializeField] private MethodExecuterService methodExecuterService;
-        [SerializeField] private InformationService informationService;
-
         [SerializeField] private List<InterpreterService> interpreterServices;
-        [SerializeField] private List<ResponseService> responseServices;
-        #endregion
-
-        #region CONSTANTS
-        private const string METHOD_CONST = "METHOD";
-        private const string INFO_CONST = "INFO";
-        private const char TWO_DOTS_SEPARATOR = ':';
+        [SerializeField] private List<DecoratorService> decoratorServices;
         #endregion
 
         #region PROPERTIES
@@ -45,71 +32,62 @@ namespace Assets.PaperGameforge.Terminal
         #region METHODS
         private void Awake()
         {
-            directoryService.SetUpValues(_FileManager, this);
-            asciiLoaderService.SetUpValues(textFormatterService);
+            SetUpValues(interpreterServices);
+            SetUpValues(decoratorServices);
+        }
+        private void SetUpValues<T>(List<T> list) where T : ITerminalService
+        {
+            foreach (var item in list)
+            {
+                switch (item)
+                {
+                    case DirectoryService directoryService:
+                        directoryService.SetUpValues(_FileManager, this);
+                        break;
+                    case MethodExecuterService methodExecuterService:
+                        methodExecuterService.SetUpValues(GetServices());
+                        break;
+                }
+            }
         }
         public List<string> Interpret(string userInput)
         {
             responses.Clear();
+            decoratedResponses.Clear();
 
-            (bool cmd_error, List<string> commandResponses) = commandService.Execute(userInput);
-
-            if (cmd_error)
+            foreach (var service in interpreterServices)
             {
-                (bool dir_error, List<string> dirResponse) = directoryService.TryProcessDirectoryRequest(userInput, this, _FileManager);
+                (bool error, List<string> serviceResponses) = service.Execute(userInput);
 
-                if (!dir_error)
+                if (!error)
                 {
-                    ProcessMultipleResponses(commandResponses);
+                    responses.AddRange(serviceResponses);
+
+                    break; // Detener la iteración si un servicio interpretó el input
                 }
             }
-            else
-            {
-                ProcessMultipleResponses(commandResponses);
-            }
 
-            return responses;
-        }
-        private void ProcessMultipleResponses(List<string> commandResponses)
-        {
-            foreach (var item in commandResponses)
+            // Decorate responses
+            for (int i = 0; i < decoratorServices.Count; i++)
             {
-                ProcessResponse(item);
-            }
-        }
-        private void ProcessResponse(string response, string userInput = null)
-        {
-            string[] args = response.Split(TWO_DOTS_SEPARATOR);
+                DecoratorService service = decoratorServices[i];
+                (bool error, List<string> decoResponse) = service.ParseResponse(responses);
 
-            if (args.Length > 1)
-            {
-                string commandType = args[0];
-                string commandParam = args[1];
-
-                switch (commandType)
+                if (error)
                 {
-                    case METHOD_CONST:
-                        responses.AddRange(methodExecuterService.ExecuteMethodCommand(commandParam, GetServices()));
-                        break;
-                    case INFO_CONST:
-                        responses.AddRange(informationService.ListEntry(commandType, commandParam));
-                        break;
+                    continue;
                 }
+                decoratedResponses.AddRange(decoResponse);
             }
-            else
-            {
-                responses.Add(response);
-            }
+
+            return decoratedResponses;
         }
         public List<ITerminalService> GetServices()
         {
-            List<ITerminalService> services = new() {
-                commandService,
-                directoryService,
-                textFormatterService,
-                asciiLoaderService,
-                cleanerService
-            };
+            List<ITerminalService> services = new();
+
+            services.AddRange(interpreterServices);
+            services.AddRange(decoratorServices);
 
             return services;
         }
