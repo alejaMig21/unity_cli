@@ -1,3 +1,4 @@
+using Assets.PaperGameforge.Terminal.TEST;
 using Assets.PaperGameforge.Terminal.UI.CustomTMP;
 using System.Collections.Generic;
 using TMPro;
@@ -40,10 +41,21 @@ namespace Assets.PaperGameforge.Terminal
         #region METHODS
         private void Awake()
         {
+            var services = _Interpreter.GetServices();
+
+            foreach (var service in services)
+            {
+                if (service is CleanerService)
+                {
+                    (service as CleanerService).OnClearStart += ClearTerminal;
+                }
+            }
+        }
+        private void Start()
+        {
             AddInterpreterLines(_Interpreter.Interpret("ascii"));
             // Move the user input line to the end.
             userInputLine.transform.SetAsLastSibling();
-            _Interpreter.OnClearStart += ClearTerminal;
         }
         private void OnGUI()
         {

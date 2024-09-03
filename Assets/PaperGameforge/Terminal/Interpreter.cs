@@ -1,7 +1,5 @@
-﻿using System;
+﻿using Assets.PaperGameforge.Terminal.TEST;
 using System.Collections.Generic;
-using System.IO;
-using System.Linq;
 using UnityEngine;
 
 namespace Assets.PaperGameforge.Terminal
@@ -11,32 +9,23 @@ namespace Assets.PaperGameforge.Terminal
     {
         #region FIELDS
         private List<string> responses = new();
-        private Dictionary<string, string> colors = new()
-        {
-            {"black",   "#021b21"},
-            {"gray",    "#555d71"},
-            {"red",     "#ff5879"},
-            {"yellow",  "#f2f1b9"},
-            {"blue",    "#9ed9d8"},
-            {"purple",  "#d936ff"},
-            {"orange",  "#ef5847"}
-        };
         private FileManager fileManager;
+        [SerializeField] private CommandService commandService;
+        [SerializeField] private DirectoryService directoryService;
+        [SerializeField] private TextFormatterService textFormatterService;
+        [SerializeField] private AsciiLoaderService asciiLoaderService;
+        [SerializeField] private CleanerService cleanerService;
+        [SerializeField] private MethodExecuterService methodExecuterService;
+        [SerializeField] private InformationService informationService;
+
+        [SerializeField] private List<InterpreterService> interpreterServices;
+        [SerializeField] private List<ResponseService> responseServices;
         #endregion
 
         #region CONSTANTS
-        private const string CHANGE_DIR_COMMAND = "cd";
-        private const string PREVIOUS_DIR_COMMAND = "..";
         private const string METHOD_CONST = "METHOD";
         private const string INFO_CONST = "INFO";
-        private const string ASCII_TITLE_ASSET = "ascii.txt";
-        private const string ERROR_DIR_COMMAND = "ERROR DIR_NOT_FOUND";
         private const char TWO_DOTS_SEPARATOR = ':';
-        private const char WHITE_SAPACE_SEPARATOR = ' ';
-        #endregion
-
-        #region EVENTS
-        public event Action OnClearStart;
         #endregion
 
         #region PROPERTIES
@@ -54,17 +43,22 @@ namespace Assets.PaperGameforge.Terminal
         #endregion
 
         #region METHODS
+        private void Awake()
+        {
+            directoryService.SetUpValues(_FileManager, this);
+            asciiLoaderService.SetUpValues(textFormatterService);
+        }
         public List<string> Interpret(string userInput)
         {
             responses.Clear();
 
-            (bool errorDuringProcessing, List<string> commandResponses) = CommandsReader.GetResponses(userInput);
+            (bool cmd_error, List<string> commandResponses) = commandService.Execute(userInput);
 
-            if (errorDuringProcessing)
+            if (cmd_error)
             {
-                (bool dirProcessed, string dirResponse) = TryProcessDirectoryRequest(userInput);
+                (bool dir_error, List<string> dirResponse) = directoryService.TryProcessDirectoryRequest(userInput, this, _FileManager);
 
-                if (!dirProcessed)
+                if (!dir_error)
                 {
                     ProcessMultipleResponses(commandResponses);
                 }
@@ -95,10 +89,10 @@ namespace Assets.PaperGameforge.Terminal
                 switch (commandType)
                 {
                     case METHOD_CONST:
-                        ExecuteMethodCommand(commandParam);
+                        responses.AddRange(methodExecuterService.ExecuteMethodCommand(commandParam, GetServices()));
                         break;
                     case INFO_CONST:
-                        ListEntry(commandType, commandParam);
+                        responses.AddRange(informationService.ListEntry(commandType, commandParam));
                         break;
                 }
             }
@@ -107,93 +101,18 @@ namespace Assets.PaperGameforge.Terminal
                 responses.Add(response);
             }
         }
-        private (bool error, string response) TryProcessDirectoryRequest(string userInput)
+        public List<ITerminalService> GetServices()
         {
-            string[] dirArgs = userInput.Split(WHITE_SAPACE_SEPARATOR);
+            List<ITerminalService> services = new() {
+                commandService,
+                directoryService,
+                textFormatterService,
+                asciiLoaderService,
+                cleanerService
+            };
 
-            if (dirArgs[0] == CHANGE_DIR_COMMAND)
-            {
-                // Join all arguments after the command into a single string for the directory
-                string dir = string.Join(WHITE_SAPACE_SEPARATOR, dirArgs.Skip(1));
-
-                (bool exists, string newPath) = ChangeDirectory(dir);
-
-                if (!exists)
-                {
-                    Interpret(ERROR_DIR_COMMAND);
-                }
-
-                return (true, newPath); // Returns the found path
-            }
-
-            return (false, _FileManager.Path); // Returns the current path
+            return services;
         }
-        public string ColorString(string s, string color)
-        {
-            string leftTag = "<color=" + color + ">";
-            string rightTag = "</color>";
-
-            return leftTag + s + rightTag;
-        }
-        private void ListEntry(string a, string b)
-        {
-            responses.Add(ColorString(a, colors["orange"]) + ": " + ColorString(b, colors["yellow"]));
-        }
-        private void LoadAscii(string path, string color, int spacing)
-        {
-            StreamReader file = new(Path.Combine(Application.streamingAssetsPath, path));
-
-            for (int i = 0; i < spacing; i++)
-            {
-                responses.Add("");
-            }
-
-            while (!file.EndOfStream)
-            {
-                responses.Add(ColorString(file.ReadLine(), colors[color]));
-            }
-
-            for (int i = 0; i < spacing; i++)
-            {
-                responses.Add("");
-            }
-
-            file.Close();
-        }
-        private (bool exists, string newPath) ChangeDirectory(string folderName)
-        {
-            if (folderName != PREVIOUS_DIR_COMMAND)
-            {
-                return _FileManager.MoveToDirectory(folderName);
-            }
-            return _FileManager.MoveToPreviousDirectory();
-        }
-
-        #region EXTERNALLY CALLED METHODS
-        private void ExecuteMethodCommand(string method)
-        {
-            GetType().GetMethod(method).Invoke(this, new object[0]);
-        }
-        public void LoadTitle()
-        {
-            LoadAscii(ASCII_TITLE_ASSET, "red", 2);
-        }
-        public void Clear()
-        {
-            OnClearStart?.Invoke();
-        }
-        public void LoadDirectories()
-        {
-            responses.Clear();
-            responses.AddRange(_FileManager.LoadDirData());
-        }
-        public void LoadFolders()
-        {
-            responses.Clear();
-            responses.AddRange(_FileManager.LoadFolders());
-        }
-        #endregion
-
         #endregion
     }
 }
