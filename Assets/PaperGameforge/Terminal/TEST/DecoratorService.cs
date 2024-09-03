@@ -1,68 +1,66 @@
-﻿using System.Collections.Generic;
+﻿using Assets.PaperGameforge.Terminal.TEST;
+using System.Collections.Generic;
 using UnityEngine;
 
-namespace Assets.PaperGameforge.Terminal.TEST
+public abstract class DecoratorService : ScriptableObject, ITerminalService
 {
-    public abstract class DecoratorService : ScriptableObject, ITerminalService
+    protected const string D_METHOD_CONST = "<DMETHOD>";
+    protected const char TWO_DOTS_SEPARATOR = ':';
+
+    public virtual (bool, List<string>) ParseResponse(List<string> responses)
     {
-        protected const string D_METHOD_CONST = "DMETHOD";
-        protected const char TWO_DOTS_SEPARATOR = ':';
+        List<string> finalList = new();
 
-        public virtual (bool, List<string>) ParseResponse(List<string> responses)
+        foreach (var item in responses)
         {
-            List<string> list = new();
+            (bool error, List<string> decoratedResponses) = ProcessResponse(item);
 
-            foreach (var item in responses)
+            if (!error && decoratedResponses != null)
             {
-                (bool error, List<string> decoratedResponses) = ProcessResponse(item);
-
-                if (!error)
-                {
-                    list.AddRange(decoratedResponses);
-                }
-                else
-                {
-                    list.Add(item);
-                }
+                // Añadir elementos decorados en lugar de la respuesta original
+                finalList.AddRange(decoratedResponses);
             }
-
-            if (list != null && list.Count > 0)
+            else
             {
-                return (false, list);
+                // Añadir la respuesta original si no puede ser decorada
+                finalList.Add(item);
             }
-            return (true, null);
         }
-        public virtual (bool, List<string>) ProcessResponse(string response, string userInput = "")
+
+        return (false, finalList.Count > 0 ? finalList : null);
+    }
+
+    public virtual (bool, List<string>) ProcessResponse(string response, string userInput = "")
+    {
+        string[] args = response.Split(TWO_DOTS_SEPARATOR);
+
+        if (args.Length > 1)
         {
-            string[] args = response.Split(TWO_DOTS_SEPARATOR);
+            string commandType = args[0];
+            string commandParam = args[1];
 
-            if (args.Length > 1)
+            if (commandType.Equals(D_METHOD_CONST))
             {
-                string commandType = args[0];
-                string commandParam = args[1];
+                object result = ExecuteMethod(commandParam);
 
-                if (commandType.Equals(D_METHOD_CONST))
+                if (result is List<string> parsedResult && parsedResult.Count > 0)
                 {
-                    object result = ExecuteMethod(commandParam);
-
-                    if (result != null && result is List<string> parsedResult)
-                    {
-                        return (false, parsedResult);
-                    }
+                    return (false, parsedResult);
                 }
             }
-
-            return (true, null);
         }
-        public virtual object ExecuteMethod(string methodName)
-        {
-            var method = GetType().GetMethod(methodName);
 
-            if (method == null) { return null; }
+        return (true, null);
+    }
 
-            object result = method.Invoke(this, new object[0]);
+    public virtual object ExecuteMethod(string methodName)
+    {
+        var method = GetType().GetMethod(methodName);
 
-            return result;
-        }
+        if (method == null) { return null; }
+
+        object result = method.Invoke(this, new object[0]);
+
+        return result;
     }
 }

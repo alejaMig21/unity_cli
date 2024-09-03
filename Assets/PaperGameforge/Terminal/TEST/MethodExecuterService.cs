@@ -6,7 +6,7 @@ namespace Assets.PaperGameforge.Terminal.TEST
     [CreateAssetMenu(fileName = "MethodExecuterService", menuName = "TerminalServices/InterpreterServices/MethodExecuterService")]
     public class MethodExecuterService : DecoratorService
     {
-        private const string I_METHOD_CONST = "IMETHOD";
+        private const string I_METHOD_CONST = "<IMETHOD>";
         private List<ITerminalService> services = new();
 
         public void SetUpValues(List<ITerminalService> services)

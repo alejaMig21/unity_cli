@@ -109,6 +109,8 @@ namespace Assets.PaperGameforge.Terminal
         }
         private int AddInterpreterLines(List<string> interpretation)
         {
+            if (interpretation == null) { return 0; }
+
             for (int i = 0; i < interpretation.Count; i++)
             {
                 // Instantiate the responses line.

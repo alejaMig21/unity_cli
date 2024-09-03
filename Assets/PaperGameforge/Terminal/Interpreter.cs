@@ -9,24 +9,14 @@ namespace Assets.PaperGameforge.Terminal
     {
         #region FIELDS
         private List<string> responses = new();
-        private List<string> decoratedResponses = new();
         private FileManager fileManager;
         [SerializeField] private List<InterpreterService> interpreterServices;
         [SerializeField] private List<DecoratorService> decoratorServices;
         #endregion
 
         #region PROPERTIES
-        public FileManager _FileManager
-        {
-            get
-            {
-                if (fileManager == null)
-                {
-                    fileManager = GetComponent<FileManager>();
-                }
-                return fileManager;
-            }
-        }
+        public FileManager _FileManager => fileManager ??= GetComponent<FileManager>();
+        public List<string> Responses { get => responses ??= new(); set => responses = value; }
         #endregion
 
         #region METHODS
@@ -52,35 +42,33 @@ namespace Assets.PaperGameforge.Terminal
         }
         public List<string> Interpret(string userInput)
         {
-            responses.Clear();
-            decoratedResponses.Clear();
+            Responses.Clear();
 
+            // Ejecuta los servicios de interpretación
             foreach (var service in interpreterServices)
             {
                 (bool error, List<string> serviceResponses) = service.Execute(userInput);
 
                 if (!error)
                 {
-                    responses.AddRange(serviceResponses);
-
+                    Responses.AddRange(serviceResponses);
                     break; // Detener la iteración si un servicio interpretó el input
                 }
             }
 
-            // Decorate responses
-            for (int i = 0; i < decoratorServices.Count; i++)
+            // Itera sobre cada decorador para decorar las respuestas
+            for (int i = 0; i < decoratorServices.Count && Responses.Count > 0; i++)
             {
                 DecoratorService service = decoratorServices[i];
-                (bool error, List<string> decoResponse) = service.ParseResponse(responses);
+                (bool error, List<string> decoResponse) = service.ParseResponse(Responses);
 
-                if (error)
+                if (!error)
                 {
-                    continue;
+                    Responses = decoResponse; // Actualizar la lista de respuestas
                 }
-                decoratedResponses.AddRange(decoResponse);
             }
 
-            return decoratedResponses;
+            return Responses; // Devuelve la lista final de respuestas decoradas
         }
         public List<ITerminalService> GetServices()
         {
