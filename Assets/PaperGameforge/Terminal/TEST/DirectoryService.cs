@@ -24,6 +24,13 @@ namespace Assets.PaperGameforge.Terminal.TEST
         {
             return TryProcessDirectoryRequest(userInput, interpreter, fileManager);
         }
+        /// <summary>
+        /// Directory requests processing.
+        /// </summary>
+        /// <param name="userInput"></param>
+        /// <param name="interpreter"></param>
+        /// <param name="fileManager"></param>
+        /// <returns>An error and always a null path because a string like that is not necessary to be showed as a response</returns>
         public (bool, List<string>) TryProcessDirectoryRequest(
             string userInput,
             Interpreter interpreter,
@@ -39,15 +46,16 @@ namespace Assets.PaperGameforge.Terminal.TEST
 
                 (bool exists, string newPath) = ChangeDirectory(dir, fileManager);
 
-                if (!exists)
+                if (!exists) // If it does not exists
                 {
                     interpreter.Interpret(ERROR_DIR_COMMAND);
+                    return (true, null); // Launch error
                 }
 
-                return (true, new List<string> { newPath }); // Returns the found path
+                return (false, null); // Else do not launch error
             }
 
-            return (false, new List<string> { fileManager.Path }); // Returns the current path
+            return (true, null); // Launch error
         }
         private (bool exists, string newPath) ChangeDirectory(string folderName, FileManager fileManager)
         {

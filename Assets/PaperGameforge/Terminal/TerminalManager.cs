@@ -54,7 +54,7 @@ namespace Assets.PaperGameforge.Terminal
         }
         private void Start()
         {
-            AddInterpreterLines(_Interpreter.Interpret("ascii"));
+            //AddInterpreterLines(_Interpreter.Interpret("ascii"));
             // Move the user input line to the end.
             userInputLine.transform.SetAsLastSibling();
         }

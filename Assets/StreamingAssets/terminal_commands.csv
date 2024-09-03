@@ -3,6 +3,7 @@ help,,,,,,,,,,,,,,,,,,"If you want to use the terminal, type 'boop'"
 ,,,,,,,,,,,,,,,,,,This is the second line that we are returning
 ,,,,,,,,,,,,,,,,,,And of course this is the third one…
 ,,,,,,,,,,,,,,,,,,<DMETHOD>:LoadTitle
+,,,,,,,,,,,,,,,,,,<IMETHOD>:LoadFolders
 ,info,,,,,,,,,,,,,,,,,INFO:returns a list of commands
 ,software,,,,,,,,,,,,,,,,,This tool is an integrated terminal for Unity games.
 ,settings,,,,,,,,,,,,,,,,,Here you can see descriptions of the game settings

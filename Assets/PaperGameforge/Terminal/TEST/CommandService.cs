@@ -10,11 +10,6 @@ namespace Assets.PaperGameforge.Terminal.TEST
         {
             var (cmd_error, commandResponses) = CommandsReader.GetResponses(userInput);
 
-            if (commandResponses == null)
-            {
-                commandResponses = new();
-            }
-
             return (cmd_error, commandResponses); // Interpretación exitosa
         }
     }

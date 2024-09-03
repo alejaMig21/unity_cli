@@ -14,6 +14,8 @@ namespace Assets.PaperGameforge.Terminal
         [SerializeField] private List<DecoratorService> decoratorServices;
         #endregion
 
+        private const string ERROR_NOT_FOUND = "ERROR NOT_FOUND";
+
         #region PROPERTIES
         public FileManager _FileManager => fileManager ??= GetComponent<FileManager>();
         public List<string> Responses { get => responses ??= new(); set => responses = value; }
@@ -45,13 +47,17 @@ namespace Assets.PaperGameforge.Terminal
             Responses.Clear();
 
             // Ejecuta los servicios de interpretación
-            foreach (var service in interpreterServices)
+            for (int i = 0; i < interpreterServices.Count; i++)
             {
+                InterpreterService service = interpreterServices[i];
                 (bool error, List<string> serviceResponses) = service.Execute(userInput);
 
                 if (!error)
                 {
-                    Responses.AddRange(serviceResponses);
+                    if (serviceResponses != null)
+                    {
+                        Responses.AddRange(serviceResponses);
+                    }
                     break; // Detener la iteración si un servicio interpretó el input
                 }
             }
