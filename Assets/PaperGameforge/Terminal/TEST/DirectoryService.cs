@@ -43,6 +43,17 @@ namespace Assets.PaperGameforge.Terminal.TEST
 
             return null; // Launch error
         }
+        public override List<ServiceResponse> Execute(List<string> userInput)
+        {
+            List<ServiceResponse> results = new();
+
+            foreach (string dir in userInput)
+            {
+                results.AddRange(Execute(dir));
+            }
+
+            return results;
+        }
         private (bool exists, string newPath) ChangeDirectory(string folderName, FileManager fileManager)
         {
             if (folderName != PREVIOUS_DIR_COMMAND)

@@ -27,6 +27,17 @@ namespace Assets.PaperGameforge.Terminal.TEST
 
             return finalResponses; // Interpretación exitosa
         }
+        public override List<ServiceResponse> Execute(List<string> userInput)
+        {
+            List<ServiceResponse> results = new();
+
+            foreach (string cmd in userInput)
+            {
+                results.AddRange(Execute(cmd));
+            }
+
+            return results;
+        }
         protected static List<ServiceResponse> GenerateServiceResponses(List<string> commandResponses, bool visibility)
         {
             List<ServiceResponse> finalResponses = new();

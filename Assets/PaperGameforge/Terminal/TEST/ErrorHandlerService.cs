@@ -36,5 +36,16 @@ namespace Assets.PaperGameforge.Terminal.TEST
 
             return finalResponses; // Interpretación exitosa
         }
+        public List<ServiceResponse> Execute<T>(List<T> errors) where T : ServiceResponse
+        {
+            List<ServiceResponse> responses = new();
+
+            foreach (T error in errors)
+            {
+                responses.AddRange(this.Execute(error.Text));
+            }
+
+            return responses;
+        }
     }
 }

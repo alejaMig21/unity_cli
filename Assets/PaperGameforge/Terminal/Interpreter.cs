@@ -1,6 +1,7 @@
 ﻿using Assets.PaperGameforge.Terminal.TEST;
 using System.Collections.Generic;
 using System.Linq;
+using Unity.VisualScripting;
 using UnityEngine;
 
 namespace Assets.PaperGameforge.Terminal
@@ -45,7 +46,7 @@ namespace Assets.PaperGameforge.Terminal
         public List<ServiceResponse> Interpret(string userInput)
         {
             Responses.Clear();
-            List<ServiceResponse> errorResponses = new();
+            List<ServiceError> errorResponses = new();
 
             // Run interpretation services
             for (int i = 0; i < interpreterServices.Count; i++)
@@ -63,40 +64,19 @@ namespace Assets.PaperGameforge.Terminal
                     Responses.AddRange(serviceResponses);
                     break; // Detener la iteración si un servicio interpretó el input
                 }
-
-                errorResponses.AddRange(serviceResponses);
+                else
+                {
+                    errorResponses.AddRange(serviceResponses);
+                }
             }
 
             // Analyzes responses in search of possible errors
             List<ServiceResponse> priorErrors = new();
-
             if (Responses.Count <= 0 && errorResponses.Count > 0)
             {
-                int priority = int.MaxValue;
-
-                foreach (var response in errorResponses)
-                {
-                    if (response is ServiceError foundError)
-                    {
-                        if (foundError.Priority < priority)
-                        {
-                            priorErrors.Clear();
-                            priorErrors.Add(foundError);
-                            priority = foundError.Priority;
-                        }
-                        else if (foundError.Priority == priority)
-                        {
-                            priorErrors.Add(foundError);
-                        }
-                    }
-                }
-
+                priorErrors = PrioritizeError(errorResponses);
                 Responses.Clear();
-                foreach (var item in priorErrors)
-                {
-                    List<ServiceResponse> errorMessages = errorHandlerService.Execute(item.Text);
-                    Responses.AddRange(errorMessages);
-                }
+                Responses = errorHandlerService.Execute(priorErrors);
             }
 
             // Run decoration services
@@ -108,6 +88,27 @@ namespace Assets.PaperGameforge.Terminal
             }
 
             return Responses;
+        }
+        private List<ServiceResponse> PrioritizeError(List<ServiceError> errorResponses)
+        {
+            List<ServiceResponse> priorErrors = new();
+            int priority = int.MaxValue;
+
+            foreach (var response in errorResponses)
+            {
+                if (response.Priority < priority)
+                {
+                    priorErrors.Clear();
+                    priorErrors.Add(response);
+                    priority = response.Priority;
+                }
+                else if (response.Priority == priority)
+                {
+                    priorErrors.Add(response);
+                }
+            }
+
+            return priorErrors;
         }
         public List<ITerminalService> GetServices()
         {
