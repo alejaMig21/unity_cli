@@ -1,5 +1,6 @@
 ﻿using Assets.PaperGameforge.Terminal.TEST;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 namespace Assets.PaperGameforge.Terminal
@@ -50,14 +51,14 @@ namespace Assets.PaperGameforge.Terminal
             for (int i = 0; i < interpreterServices.Count; i++)
             {
                 InterpreterService service = interpreterServices[i];
-                (bool error, var serviceResponses) = service.Execute(userInput);
+                var serviceResponses = service.Execute(userInput);
 
                 if (serviceResponses == null)
                 {
                     continue;
                 }
 
-                if (!error)
+                if (serviceResponses.All(item => item is not ServiceError))
                 {
                     Responses.AddRange(serviceResponses);
                     break; // Detener la iteración si un servicio interpretó el input
@@ -93,7 +94,7 @@ namespace Assets.PaperGameforge.Terminal
                 Responses.Clear();
                 foreach (var item in priorErrors)
                 {
-                    (bool _, List<ServiceResponse> errorMessages) = errorHandlerService.Execute(item.Text);
+                    List<ServiceResponse> errorMessages = errorHandlerService.Execute(item.Text);
                     Responses.AddRange(errorMessages);
                 }
             }
@@ -102,12 +103,8 @@ namespace Assets.PaperGameforge.Terminal
             for (int i = 0; i < decoratorServices.Count && Responses.Count > 0; i++)
             {
                 DecoratorService service = decoratorServices[i];
-                (bool error, var decoResponse) = service.ParseResponse(Responses);
-
-                if (!error)
-                {
-                    Responses = decoResponse; // Now responses are decorated
-                }
+                var decoResponse = service.ParseResponse(Responses);
+                Responses = decoResponse; // Now responses are decorated
             }
 
             return Responses;

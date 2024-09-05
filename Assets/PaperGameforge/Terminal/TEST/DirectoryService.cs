@@ -22,7 +22,7 @@ namespace Assets.PaperGameforge.Terminal.TEST
             this.fileManager = fileManager;
             this.interpreter = interpreter;
         }
-        public override (bool, List<ServiceResponse>) Execute(string userInput)
+        public override List<ServiceResponse> Execute(string userInput)
         {
             string[] dirArgs = userInput.Split(WHITE_SAPACE_SEPARATOR);
 
@@ -35,13 +35,13 @@ namespace Assets.PaperGameforge.Terminal.TEST
 
                 if (!exists) // If it does not exists
                 {
-                    return (true, new() { new ServiceError(errorDirCmd.Cmd, false, ERROR_PRIORITY) }); // Launch error
+                    return new() { new ServiceError(errorDirCmd.Cmd, false, ERROR_PRIORITY) }; // Launch error
                 }
 
-                return (false, new() { new(string.Empty, true) }); // Else do not launch error
+                return new() { new(string.Empty, true) }; // Else do not launch error
             }
 
-            return (true, null); // Launch error
+            return null; // Launch error
         }
         private (bool exists, string newPath) ChangeDirectory(string folderName, FileManager fileManager)
         {

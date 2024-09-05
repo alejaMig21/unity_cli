@@ -8,7 +8,7 @@ namespace Assets.PaperGameforge.Terminal.TEST
     {
         private readonly ErrorKey baseError = new("ERROR");
 
-        public override (bool, List<ServiceResponse>) Execute(string userInput = null)
+        public override List<ServiceResponse> Execute(string userInput = null)
         {
             if (userInput == null)
             {
@@ -17,7 +17,7 @@ namespace Assets.PaperGameforge.Terminal.TEST
                     false
                     );
 
-                return (true, errorResponses); // Interpretación fallida
+                return errorResponses; // Interpretación fallida
             }
 
             var (cmd_error, commandResponses) = CommandsReader.GetResponses(userInput);
@@ -29,12 +29,12 @@ namespace Assets.PaperGameforge.Terminal.TEST
                     false
                     );
 
-                return (true, errorResponses); // Interpretación fallida
+                return errorResponses; // Interpretación fallida
             }
 
             List<ServiceResponse> finalResponses = GenerateServiceResponses(commandResponses, false);
 
-            return (false, finalResponses); // Interpretación exitosa
+            return finalResponses; // Interpretación exitosa
         }
     }
 }

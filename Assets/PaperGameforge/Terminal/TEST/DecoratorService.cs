@@ -7,7 +7,7 @@ public abstract class DecoratorService : ScriptableObject, ITerminalService
     protected const string D_METHOD_CONST = "<DMETHOD>";
     protected const char TWO_DOTS_SEPARATOR = ':';
 
-    public virtual (bool, List<ServiceResponse>) ParseResponse(List<ServiceResponse> responses)
+    public virtual List<ServiceResponse> ParseResponse(List<ServiceResponse> responses)
     {
         List<ServiceResponse> finalList = new();
 
@@ -18,9 +18,9 @@ public abstract class DecoratorService : ScriptableObject, ITerminalService
                 continue;
             }
 
-            (bool error, List<ServiceResponse> decoratedResponses) = ProcessResponse(item);
+            List<ServiceResponse> decoratedResponses = ProcessResponse(item);
 
-            if (!error && decoratedResponses != null)
+            if (decoratedResponses != null)
             {
                 // Añadir elementos decorados en lugar de la respuesta original
                 finalList.AddRange(decoratedResponses);
@@ -32,10 +32,10 @@ public abstract class DecoratorService : ScriptableObject, ITerminalService
             }
         }
 
-        return (false, finalList.Count > 0 ? finalList : null);
+        return finalList.Count > 0 ? finalList : null;
     }
 
-    public virtual (bool, List<ServiceResponse>) ProcessResponse(ServiceResponse response, string userInput = "")
+    public virtual List<ServiceResponse> ProcessResponse(ServiceResponse response, string userInput = "")
     {
         string[] args = response.Text.Split(TWO_DOTS_SEPARATOR);
 
@@ -50,12 +50,12 @@ public abstract class DecoratorService : ScriptableObject, ITerminalService
 
                 if (result is List<ServiceResponse> parsedResult && parsedResult.Count > 0)
                 {
-                    return (false, parsedResult);
+                    return parsedResult;
                 }
             }
         }
 
-        return (true, null);
+        return null;
     }
 
     public virtual object ExecuteMethod(string methodName)

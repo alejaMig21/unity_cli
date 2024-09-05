@@ -8,7 +8,7 @@ namespace Assets.PaperGameforge.Terminal.TEST
     {
         private const string INFO_CONST = "INFO";
 
-        public override (bool, List<ServiceResponse>) ProcessResponse(ServiceResponse response, string userInput = null)
+        public override List<ServiceResponse> ProcessResponse(ServiceResponse response, string userInput = null)
         {
             string[] args = response.Text.Split(TWO_DOTS_SEPARATOR);
 
@@ -19,11 +19,11 @@ namespace Assets.PaperGameforge.Terminal.TEST
 
                 if (commandType.Equals(INFO_CONST))
                 {
-                    return (true, null); ///// FIX
+                    return null; ///// FIX
                 }
             }
 
-            return (true, new() { response });
+            return new() { response };
         }
     }
 }

@@ -14,7 +14,7 @@ namespace Assets.PaperGameforge.Terminal.TEST
             this.services = services;
         }
 
-        public override (bool, List<ServiceResponse>) ProcessResponse(ServiceResponse response, string userInput = null)
+        public override List<ServiceResponse> ProcessResponse(ServiceResponse response, string userInput = null)
         {
             string[] args = response.Text.Split(TWO_DOTS_SEPARATOR);
 
@@ -29,9 +29,9 @@ namespace Assets.PaperGameforge.Terminal.TEST
                 }
             }
 
-            return (true, null);
+            return null;
         }
-        public (bool, List<ServiceResponse>) ExecuteMethodCommand(string method, List<ITerminalService> services)
+        public List<ServiceResponse> ExecuteMethodCommand(string method, List<ITerminalService> services)
         {
             List<ServiceResponse> responses = new();
 
@@ -55,11 +55,11 @@ namespace Assets.PaperGameforge.Terminal.TEST
                         responses.AddRange(stringList);
                     }
 
-                    return (false, responses);
+                    return responses;
                 }
             }
 
-            return (true, responses);
+            return responses;
         }
     }
 }

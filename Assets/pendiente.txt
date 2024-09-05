@@ -1,4 +1,4 @@
-1-Mejorar la manera en la que el interprete determina si usar un procesado de comando o de directorio.
+1-Centralizar los procesados multiples en los respectivos servicios de terminal (asegurar que el interprete solo realice llamadas al metodo execute de cada servicio)
 2-Poder viajar hacia comandos previos y posteriores con las flechas de direccion.
 3-Poder copiar y pegar directorios.
 4-Poder escribir en el CSV de los comandos de la terminal.
