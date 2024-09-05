@@ -2,7 +2,7 @@
 
 namespace Assets.PaperGameforge.Terminal.TEST
 {
-    [CreateAssetMenu(fileName = "CleanerService", menuName = "TerminalServices/InterpreterServices/CleanerService")]
+    [CreateAssetMenu(fileName = "CleanerService", menuName = "TerminalServices/DecoratorServices/CleanerService")]
     public class CleanerService : DecoratorService
     {
         #region EVENTS

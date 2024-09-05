@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace Assets.PaperGameforge.Terminal.TEST
 {
-    [CreateAssetMenu(fileName = "AsciiLoaderService", menuName = "TerminalServices/InterpreterServices/AsciiLoaderService")]
+    [CreateAssetMenu(fileName = "AsciiLoaderService", menuName = "TerminalServices/DecoratorServices/AsciiLoaderService")]
     public class AsciiLoaderService : DecoratorService
     {
         [SerializeField] private TextFormatterService textFormatterService;

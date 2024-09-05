@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace Assets.PaperGameforge.Terminal.TEST
 {
-    [CreateAssetMenu(fileName = "TextFormatterService", menuName = "TerminalServices/ResponseServices/TextFormatterService")]
+    [CreateAssetMenu(fileName = "TextFormatterService", menuName = "TerminalServices/DecoratorServices/TextFormatterService")]
     public class TextFormatterService : DecoratorService
     {
         [SerializeField]

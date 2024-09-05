@@ -19,3 +19,4 @@ clear,,,,,,,,,,,,,,,,,,<DMETHOD>:Clear
 cd,,,,,,,,,,,,,,,,,,
 ,dir,,,,,,,,,,,,,,,,,<IMETHOD>:LoadFolders
 ,,all,,,,,,,,,,,,,,,,<IMETHOD>:LoadDirectories
+close,,,,,,,,,,,,,,,,,,<DMETHOD>:CloseTerminal
