@@ -7,6 +7,8 @@ namespace Assets.PaperGameforge.Terminal.TEST
     [CreateAssetMenu(fileName = "AsciiLoaderService", menuName = "TerminalServices/InterpreterServices/AsciiLoaderService")]
     public class AsciiLoaderService : DecoratorService
     {
+        [SerializeField] private TextFormatterService textFormatterService;
+
         private const string ASCII_TITLE_ASSET = "ascii.txt";
         private const int SPACING = 1;
 
@@ -27,7 +29,14 @@ namespace Assets.PaperGameforge.Terminal.TEST
 
             while (!file.EndOfStream)
             {
-                responses.Add(new(file.ReadLine(), false));
+                responses.Add(
+                    new(
+                        textFormatterService.DecorateSpecialResponse(file.ReadLine()),
+                        false
+                        )
+                    );
+
+                //responses.Add(new(file.ReadLine(), false));
             }
 
             for (int i = 0; i < spacing; i++)

@@ -1,9 +1,8 @@
-1-Centralizar los procesados multiples en los respectivos servicios de terminal (asegurar que el interprete solo realice llamadas al metodo execute de cada servicio)
-2-Poder viajar hacia comandos previos y posteriores con las flechas de direccion.
-3-Poder copiar y pegar directorios.
-4-Poder escribir en el CSV de los comandos de la terminal.
-5-Poder "instalar" paquetes (se escrbiran nuevas celdas en el CSV).
-6-Poder crear entornos virtuales (sera crear nuevos CSV en blanco).
-7-Optimizar las busquedas dentro del CSV (usar un arbol).
-8-Preparar la terminal para lidiar con archivos cuyo directorio tiene denegada la inspeccion.
-9-Optimizar la terminal (si se hacen muchas request los gameObjects comienzan a limitar el rendimiento)
+1-Poder viajar hacia comandos previos y posteriores con las flechas de direccion.
+2-Poder copiar y pegar directorios.
+3-Poder escribir en el CSV de los comandos de la terminal.
+4-Poder "instalar" paquetes (se escrbiran nuevas celdas en el CSV).
+5-Poder crear entornos virtuales (sera crear nuevos CSV en blanco).
+6-Optimizar las busquedas dentro del CSV (usar un arbol).
+7-Preparar la terminal para lidiar con archivos cuyo directorio tiene denegada la inspeccion.
+8-Optimizar la terminal (si se hacen muchas request los gameObjects comienzan a limitar el rendimiento)

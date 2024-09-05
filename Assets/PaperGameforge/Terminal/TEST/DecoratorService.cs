@@ -34,7 +34,6 @@ public abstract class DecoratorService : ScriptableObject, ITerminalService
 
         return finalList.Count > 0 ? finalList : null;
     }
-
     public virtual List<ServiceResponse> ProcessResponse(ServiceResponse response, string userInput = "")
     {
         string[] args = response.Text.Split(TWO_DOTS_SEPARATOR);
@@ -57,7 +56,6 @@ public abstract class DecoratorService : ScriptableObject, ITerminalService
 
         return null;
     }
-
     public virtual object ExecuteMethod(string methodName)
     {
         var method = GetType().GetMethod(methodName);
