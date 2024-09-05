@@ -6,11 +6,36 @@ namespace Assets.PaperGameforge.Terminal.TEST
     [CreateAssetMenu(fileName = "CommandService", menuName = "TerminalServices/InterpreterServices/CommandService")]
     public class CommandService : InterpreterService
     {
-        public override (bool, List<string>) Execute(string userInput)
+        private readonly ErrorKey notFound = new("ERROR NOT_FOUND");
+        private const int ERROR_PRIORITY = 10;
+
+        public override (bool, List<ServiceResponse>) Execute(string userInput = null)
         {
+            if (userInput == null)
+            {
+                return (true, new() { new(notFound.Cmd, false) }); // Interpretación fallida
+            }
+
             var (cmd_error, commandResponses) = CommandsReader.GetResponses(userInput);
 
-            return (cmd_error, commandResponses); // Interpretación exitosa
+            if (cmd_error)
+            {
+                return (true, new() { new ServiceError(notFound.Cmd, false, ERROR_PRIORITY) }); // Interpretación fallida
+            }
+
+            List<ServiceResponse> finalResponses = GenerateServiceResponses(commandResponses, false);
+
+            return (false, finalResponses); // Interpretación exitosa
+        }
+        protected static List<ServiceResponse> GenerateServiceResponses(List<string> commandResponses, bool visibility)
+        {
+            List<ServiceResponse> finalResponses = new();
+            foreach (var response in commandResponses)
+            {
+                finalResponses.Add(new(response, visibility));
+            }
+
+            return finalResponses;
         }
     }
 }

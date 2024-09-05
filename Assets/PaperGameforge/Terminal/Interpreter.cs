@@ -8,17 +8,16 @@ namespace Assets.PaperGameforge.Terminal
     public class Interpreter : MonoBehaviour
     {
         #region FIELDS
-        private List<string> responses = new();
+        private List<ServiceResponse> responses = new();
         private FileManager fileManager;
         [SerializeField] private List<InterpreterService> interpreterServices;
         [SerializeField] private List<DecoratorService> decoratorServices;
+        [SerializeField] private ErrorHandlerService errorHandlerService;
         #endregion
-
-        private const string ERROR_NOT_FOUND = "ERROR NOT_FOUND";
 
         #region PROPERTIES
         public FileManager _FileManager => fileManager ??= GetComponent<FileManager>();
-        public List<string> Responses { get => responses ??= new(); set => responses = value; }
+        public List<ServiceResponse> Responses { get => responses ??= new(); set => responses = value; }
         #endregion
 
         #region METHODS
@@ -42,39 +41,76 @@ namespace Assets.PaperGameforge.Terminal
                 }
             }
         }
-        public List<string> Interpret(string userInput)
+        public List<ServiceResponse> Interpret(string userInput)
         {
             Responses.Clear();
+            List<ServiceResponse> errorResponses = new();
 
-            // Ejecuta los servicios de interpretación
+            // Run interpretation services
             for (int i = 0; i < interpreterServices.Count; i++)
             {
                 InterpreterService service = interpreterServices[i];
-                (bool error, List<string> serviceResponses) = service.Execute(userInput);
+                (bool error, var serviceResponses) = service.Execute(userInput);
+
+                if (serviceResponses == null)
+                {
+                    continue;
+                }
 
                 if (!error)
                 {
-                    if (serviceResponses != null)
-                    {
-                        Responses.AddRange(serviceResponses);
-                    }
+                    Responses.AddRange(serviceResponses);
                     break; // Detener la iteración si un servicio interpretó el input
+                }
+
+                errorResponses.AddRange(serviceResponses);
+            }
+
+            // Analyzes responses in search of possible errors
+            List<ServiceResponse> priorErrors = new();
+
+            if (Responses.Count <= 0 && errorResponses.Count > 0)
+            {
+                int priority = int.MaxValue;
+
+                foreach (var response in errorResponses)
+                {
+                    if (response is ServiceError foundError)
+                    {
+                        if (foundError.Priority < priority)
+                        {
+                            priorErrors.Clear();
+                            priorErrors.Add(foundError);
+                            priority = foundError.Priority;
+                        }
+                        else if (foundError.Priority == priority)
+                        {
+                            priorErrors.Add(foundError);
+                        }
+                    }
+                }
+
+                Responses.Clear();
+                foreach (var item in priorErrors)
+                {
+                    (bool _, List<ServiceResponse> errorMessages) = errorHandlerService.Execute(item.Text);
+                    Responses.AddRange(errorMessages);
                 }
             }
 
-            // Itera sobre cada decorador para decorar las respuestas
+            // Run decoration services
             for (int i = 0; i < decoratorServices.Count && Responses.Count > 0; i++)
             {
                 DecoratorService service = decoratorServices[i];
-                (bool error, List<string> decoResponse) = service.ParseResponse(Responses);
+                (bool error, var decoResponse) = service.ParseResponse(Responses);
 
                 if (!error)
                 {
-                    Responses = decoResponse; // Actualizar la lista de respuestas
+                    Responses = decoResponse; // Now responses are decorated
                 }
             }
 
-            return Responses; // Devuelve la lista final de respuestas decoradas
+            return Responses;
         }
         public List<ITerminalService> GetServices()
         {

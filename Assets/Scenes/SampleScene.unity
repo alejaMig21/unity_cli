@@ -1957,12 +1957,13 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   interpreterServices:
-  - {fileID: 11400000, guid: 3b0a5087cfbd9b3439065643babbffbb, type: 2}
   - {fileID: 11400000, guid: b7acee9f2dda01b4c9543e83d264a7bd, type: 2}
+  - {fileID: 11400000, guid: 3b0a5087cfbd9b3439065643babbffbb, type: 2}
   decoratorServices:
   - {fileID: 11400000, guid: 8573132aa48399147b844a571b0ef8c2, type: 2}
   - {fileID: 11400000, guid: 5c88e6b5a09abaa4d9576b66428711a1, type: 2}
   - {fileID: 11400000, guid: 196a7814e12a0c2449c2c5f6c0f4dff6, type: 2}
+  errorHandlerService: {fileID: 11400000, guid: c57d3f28b2ef63f469ee35a0dd38d37b, type: 2}
 --- !u!114 &1103903315
 MonoBehaviour:
   m_ObjectHideFlags: 0

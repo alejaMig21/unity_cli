@@ -14,9 +14,9 @@ namespace Assets.PaperGameforge.Terminal.TEST
             this.services = services;
         }
 
-        public override (bool, List<string>) ProcessResponse(string response, string userInput = null)
+        public override (bool, List<ServiceResponse>) ProcessResponse(ServiceResponse response, string userInput = null)
         {
-            string[] args = response.Split(TWO_DOTS_SEPARATOR);
+            string[] args = response.Text.Split(TWO_DOTS_SEPARATOR);
 
             if (args.Length > 1)
             {
@@ -31,9 +31,9 @@ namespace Assets.PaperGameforge.Terminal.TEST
 
             return (true, null);
         }
-        public (bool, List<string>) ExecuteMethodCommand(string method, List<ITerminalService> services)
+        public (bool, List<ServiceResponse>) ExecuteMethodCommand(string method, List<ITerminalService> services)
         {
-            List<string> responses = new();
+            List<ServiceResponse> responses = new();
 
             // Iterar sobre cada instancia en la lista
             foreach (var service in services)
@@ -50,7 +50,7 @@ namespace Assets.PaperGameforge.Terminal.TEST
                     var result = methodInfo.Invoke(service, new object[0]);
 
                     // Verificar si el resultado es una lista de strings
-                    if (result is List<string> stringList)
+                    if (result is List<ServiceResponse> stringList)
                     {
                         responses.AddRange(stringList);
                     }

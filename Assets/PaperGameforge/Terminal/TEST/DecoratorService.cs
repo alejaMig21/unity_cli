@@ -7,13 +7,18 @@ public abstract class DecoratorService : ScriptableObject, ITerminalService
     protected const string D_METHOD_CONST = "<DMETHOD>";
     protected const char TWO_DOTS_SEPARATOR = ':';
 
-    public virtual (bool, List<string>) ParseResponse(List<string> responses)
+    public virtual (bool, List<ServiceResponse>) ParseResponse(List<ServiceResponse> responses)
     {
-        List<string> finalList = new();
+        List<ServiceResponse> finalList = new();
 
         foreach (var item in responses)
         {
-            (bool error, List<string> decoratedResponses) = ProcessResponse(item);
+            if (item.BackgroundProcess)
+            {
+                continue;
+            }
+
+            (bool error, List<ServiceResponse> decoratedResponses) = ProcessResponse(item);
 
             if (!error && decoratedResponses != null)
             {
@@ -30,9 +35,9 @@ public abstract class DecoratorService : ScriptableObject, ITerminalService
         return (false, finalList.Count > 0 ? finalList : null);
     }
 
-    public virtual (bool, List<string>) ProcessResponse(string response, string userInput = "")
+    public virtual (bool, List<ServiceResponse>) ProcessResponse(ServiceResponse response, string userInput = "")
     {
-        string[] args = response.Split(TWO_DOTS_SEPARATOR);
+        string[] args = response.Text.Split(TWO_DOTS_SEPARATOR);
 
         if (args.Length > 1)
         {
@@ -43,7 +48,7 @@ public abstract class DecoratorService : ScriptableObject, ITerminalService
             {
                 object result = ExecuteMethod(commandParam);
 
-                if (result is List<string> parsedResult && parsedResult.Count > 0)
+                if (result is List<ServiceResponse> parsedResult && parsedResult.Count > 0)
                 {
                     return (false, parsedResult);
                 }

@@ -10,29 +10,29 @@ namespace Assets.PaperGameforge.Terminal.TEST
         private const string ASCII_TITLE_ASSET = "ascii.txt";
         private const int SPACING = 1;
 
-        public List<string> LoadTitle()
+        public List<ServiceResponse> LoadTitle()
         {
             return LoadAscii(ASCII_TITLE_ASSET, SPACING);
         }
-        private List<string> LoadAscii(string fileName, int spacing)
+        private List<ServiceResponse> LoadAscii(string fileName, int spacing)
         {
-            List<string> responses = new();
+            List<ServiceResponse> responses = new();
 
             StreamReader file = new(Path.Combine(UnityEngine.Application.streamingAssetsPath, fileName));
 
             for (int i = 0; i < spacing; i++)
             {
-                responses.Add("");
+                responses.Add(new(string.Empty, false));
             }
 
             while (!file.EndOfStream)
             {
-                responses.Add(file.ReadLine());
+                responses.Add(new(file.ReadLine(), false));
             }
 
             for (int i = 0; i < spacing; i++)
             {
-                responses.Add("");
+                responses.Add(new(string.Empty, false));
             }
 
             file.Close();

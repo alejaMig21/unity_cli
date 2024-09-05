@@ -8,9 +8,9 @@ namespace Assets.PaperGameforge.Terminal.TEST
     {
         private const string INFO_CONST = "INFO";
 
-        public override (bool, List<string>) ProcessResponse(string response, string userInput = null)
+        public override (bool, List<ServiceResponse>) ProcessResponse(ServiceResponse response, string userInput = null)
         {
-            string[] args = response.Split(TWO_DOTS_SEPARATOR);
+            string[] args = response.Text.Split(TWO_DOTS_SEPARATOR);
 
             if (args.Length > 1)
             {

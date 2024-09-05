@@ -12,9 +12,9 @@ help,,,,,,,,,,,,,,,,,,"If you want to use the terminal, type 'boop'"
 ascii,,,,,,,,,,,,,,,,,,<DMETHOD>:LoadTitle
 ,,,,,,,,,,,,,,,,,,
 ,,,,,,,,,,,,,,,,,,
-ERROR,,,,,,,,,,,,,,,,,,Somethig went wrong
-,NOT_FOUND,,,,,,,,,,,,,,,,,Command not recognized. Type help for a list of commands
-,DIR_NOT_FOUND,,,,,,,,,,,,,,,,,Directory not found
+ERROR,,,,,,,,,,,,,,,,,,[ERROR]:Somethig went wrong
+,NOT_FOUND,,,,,,,,,,,,,,,,,[ERROR]:Command not recognized. Type help for a list of commands
+,DIR_NOT_FOUND,,,,,,,,,,,,,,,,,[ERROR]:Directory not found
 clear,,,,,,,,,,,,,,,,,,<DMETHOD>:Clear
 cd,,,,,,,,,,,,,,,,,,
 ,dir,,,,,,,,,,,,,,,,,<IMETHOD>:LoadFolders

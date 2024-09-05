@@ -107,7 +107,7 @@ namespace Assets.PaperGameforge.Terminal
                 child.CreateTextInfo(GetCurrentRenderedDirectory(), userInput);
             }
         }
-        private int AddInterpreterLines(List<string> interpretation)
+        private int AddInterpreterLines(List<ServiceResponse> interpretation)
         {
             if (interpretation == null) { return 0; }
 
@@ -124,7 +124,7 @@ namespace Assets.PaperGameforge.Terminal
                 msgList.GetComponent<RectTransform>().sizeDelta = new(listSize.x, listSize.y + PIXELS_PER_LINE);
 
                 // Set the dirText of this responses line to be whatever the interpreter string is.
-                res.GetComponentInChildren<TextMeshProUGUI>().text = interpretation[i];
+                res.GetComponentInChildren<TextMeshProUGUI>().text = interpretation[i].Text;
             }
 
             return interpretation.Count;
