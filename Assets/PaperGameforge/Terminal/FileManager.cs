@@ -46,7 +46,7 @@ namespace Assets.PaperGameforge.Terminal
         #region METHODS
         private void Awake()
         {
-            dirText.text = path + "\\";
+            Path = Application.streamingAssetsPath;
         }
         public List<string> LoadDirData()
         {
