@@ -1,7 +1,9 @@
-﻿using System.Collections.Generic;
+﻿using Assets.PaperGameforge.Terminal.Services.Interfaces;
+using Assets.PaperGameforge.Terminal.Services.Responses;
+using System.Collections.Generic;
 using UnityEngine;
 
-namespace Assets.PaperGameforge.Terminal.TEST
+namespace Assets.PaperGameforge.Terminal.Services
 {
     public abstract class InterpreterService : ScriptableObject, ITerminalService
     {

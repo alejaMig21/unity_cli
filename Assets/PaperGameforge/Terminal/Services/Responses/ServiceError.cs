@@ -1,4 +1,4 @@
-﻿namespace Assets.PaperGameforge.Terminal.TEST
+﻿namespace Assets.PaperGameforge.Terminal.Services.Responses
 {
     public class ServiceError : ServiceResponse
     {

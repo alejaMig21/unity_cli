@@ -1,7 +1,10 @@
-﻿using System.Collections.Generic;
+﻿using Assets.PaperGameforge.Terminal.Managers;
+using Assets.PaperGameforge.Terminal.Services.Responses;
+using Assets.PaperGameforge.Terminal.Services.Structs;
+using System.Collections.Generic;
 using UnityEngine;
 
-namespace Assets.PaperGameforge.Terminal.TEST
+namespace Assets.PaperGameforge.Terminal.Services
 {
     [CreateAssetMenu(fileName = "TextFormatterService", menuName = "TerminalServices/DecoratorServices/TextFormatterService")]
     public class TextFormatterService : DecoratorService

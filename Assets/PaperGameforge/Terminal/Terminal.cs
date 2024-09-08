@@ -1,4 +1,5 @@
-using Assets.PaperGameforge.Terminal.TEST;
+using Assets.PaperGameforge.Terminal.Services;
+using Assets.PaperGameforge.Terminal.Services.Responses;
 using Assets.PaperGameforge.Terminal.UI.CustomTMP;
 using System.Collections.Generic;
 using TMPro;
@@ -8,7 +9,7 @@ using UnityEngine.UI;
 namespace Assets.PaperGameforge.Terminal
 {
     [RequireComponent(typeof(Interpreter))]
-    public class TerminalManager : MonoBehaviour
+    public class Terminal : MonoBehaviour
     {
         #region FIELDS
         [SerializeField] private GameObject processedLine;

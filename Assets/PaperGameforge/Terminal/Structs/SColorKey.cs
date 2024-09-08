@@ -1,7 +1,7 @@
 ﻿using System;
 using UnityEngine;
 
-namespace Assets.PaperGameforge.Terminal.TEST
+namespace Assets.PaperGameforge.Terminal.Services.Structs
 {
     [Serializable]
     public struct SColorKey

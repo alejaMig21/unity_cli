@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace Assets.PaperGameforge.Terminal.TEST
+namespace Assets.PaperGameforge.Terminal.Managers
 {
     public static class ColorManager
     {

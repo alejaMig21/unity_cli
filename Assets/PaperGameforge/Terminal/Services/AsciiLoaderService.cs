@@ -1,8 +1,9 @@
-﻿using System.Collections.Generic;
+﻿using Assets.PaperGameforge.Terminal.Services.Responses;
+using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
 
-namespace Assets.PaperGameforge.Terminal.TEST
+namespace Assets.PaperGameforge.Terminal.Services
 {
     [CreateAssetMenu(fileName = "AsciiLoaderService", menuName = "TerminalServices/DecoratorServices/AsciiLoaderService")]
     public class AsciiLoaderService : DecoratorService

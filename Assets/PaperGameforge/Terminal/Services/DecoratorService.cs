@@ -1,69 +1,73 @@
-﻿using Assets.PaperGameforge.Terminal.TEST;
+﻿using Assets.PaperGameforge.Terminal.Services.Interfaces;
+using Assets.PaperGameforge.Terminal.Services.Responses;
 using System.Collections.Generic;
 using UnityEngine;
 
-public abstract class DecoratorService : ScriptableObject, ITerminalService
+namespace Assets.PaperGameforge.Terminal.Services
 {
-    protected const string D_METHOD_CONST = "<DMETHOD>";
-    protected const char TWO_DOTS_SEPARATOR = ':';
-
-    public virtual List<ServiceResponse> ParseResponse(List<ServiceResponse> responses)
+    public abstract class DecoratorService : ScriptableObject, ITerminalService
     {
-        List<ServiceResponse> finalList = new();
+        protected const string D_METHOD_CONST = "<DMETHOD>";
+        protected const char TWO_DOTS_SEPARATOR = ':';
 
-        foreach (var item in responses)
+        public virtual List<ServiceResponse> ParseResponse(List<ServiceResponse> responses)
         {
-            if (item.BackgroundProcess)
+            List<ServiceResponse> finalList = new();
+
+            foreach (var item in responses)
             {
-                continue;
-            }
-
-            List<ServiceResponse> decoratedResponses = ProcessResponse(item);
-
-            if (decoratedResponses != null)
-            {
-                // Añadir elementos decorados en lugar de la respuesta original
-                finalList.AddRange(decoratedResponses);
-            }
-            else
-            {
-                // Añadir la respuesta original si no puede ser decorada
-                finalList.Add(item);
-            }
-        }
-
-        return finalList.Count > 0 ? finalList : null;
-    }
-    public virtual List<ServiceResponse> ProcessResponse(ServiceResponse response, string userInput = "")
-    {
-        string[] args = response.Text.Split(TWO_DOTS_SEPARATOR);
-
-        if (args.Length > 1)
-        {
-            string commandType = args[0];
-            string commandParam = args[1];
-
-            if (commandType.Equals(D_METHOD_CONST))
-            {
-                object result = ExecuteMethod(commandParam);
-
-                if (result is List<ServiceResponse> parsedResult && parsedResult.Count > 0)
+                if (item.BackgroundProcess)
                 {
-                    return parsedResult;
+                    continue;
+                }
+
+                List<ServiceResponse> decoratedResponses = ProcessResponse(item);
+
+                if (decoratedResponses != null)
+                {
+                    // Añadir elementos decorados en lugar de la respuesta original
+                    finalList.AddRange(decoratedResponses);
+                }
+                else
+                {
+                    // Añadir la respuesta original si no puede ser decorada
+                    finalList.Add(item);
                 }
             }
+
+            return finalList.Count > 0 ? finalList : null;
         }
+        public virtual List<ServiceResponse> ProcessResponse(ServiceResponse response, string userInput = "")
+        {
+            string[] args = response.Text.Split(TWO_DOTS_SEPARATOR);
 
-        return null;
-    }
-    public virtual object ExecuteMethod(string methodName)
-    {
-        var method = GetType().GetMethod(methodName);
+            if (args.Length > 1)
+            {
+                string commandType = args[0];
+                string commandParam = args[1];
 
-        if (method == null) { return null; }
+                if (commandType.Equals(D_METHOD_CONST))
+                {
+                    object result = ExecuteMethod(commandParam);
 
-        object result = method.Invoke(this, new object[0]);
+                    if (result is List<ServiceResponse> parsedResult && parsedResult.Count > 0)
+                    {
+                        return parsedResult;
+                    }
+                }
+            }
 
-        return result;
+            return null;
+        }
+        public virtual object ExecuteMethod(string methodName)
+        {
+            var method = GetType().GetMethod(methodName);
+
+            if (method == null) { return null; }
+
+            object result = method.Invoke(this, new object[0]);
+
+            return result;
+        }
     }
 }

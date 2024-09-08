@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace Assets.PaperGameforge.Terminal.TEST
+namespace Assets.PaperGameforge.Terminal.Services
 {
     [CreateAssetMenu(fileName = "CleanerService", menuName = "TerminalServices/DecoratorServices/CleanerService")]
     public class CleanerService : DecoratorService

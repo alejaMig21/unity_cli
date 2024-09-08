@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace Assets.PaperGameforge.Terminal.TEST
+namespace Assets.PaperGameforge.Terminal.Services
 {
     [CreateAssetMenu(fileName = "CloseService", menuName = "TerminalServices/DecoratorServices/CloseService")]
     public class CloseService : DecoratorService
