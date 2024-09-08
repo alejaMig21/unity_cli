@@ -10,17 +10,15 @@ namespace Assets.PaperGameforge.Terminal.TEST
 
         private readonly ErrorKey errorDirCmd = new("ERROR DIR_NOT_FOUND");
         private FileManager fileManager;
-        private Interpreter interpreter;
 
         private const string CHANGE_DIR_COMMAND = "cd";
         private const string PREVIOUS_DIR_COMMAND = "..";
         private const char WHITE_SAPACE_SEPARATOR = ' ';
         private const int ERROR_PRIORITY = 9;
 
-        public void SetUpValues(FileManager fileManager, Interpreter interpreter)
+        public void SetUpValues(FileManager fileManager)
         {
             this.fileManager = fileManager;
-            this.interpreter = interpreter;
         }
         public override List<ServiceResponse> Execute(string userInput)
         {

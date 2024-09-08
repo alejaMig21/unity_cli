@@ -35,7 +35,7 @@ namespace Assets.PaperGameforge.Terminal
                 switch (item)
                 {
                     case DirectoryService directoryService:
-                        directoryService.SetUpValues(_FileManager, this);
+                        directoryService.SetUpValues(_FileManager);
                         break;
                     case MethodExecuterService methodExecuterService:
                         methodExecuterService.SetUpValues(GetServices());
