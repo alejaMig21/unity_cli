@@ -24,6 +24,8 @@ namespace Assets.PaperGameforge.Terminal
                 return text;
             }
         }
+        public string Directory { get => directory; }
+        public string UserInput { get => userInput; }
         #endregion
 
         #region CONSTRUCTOR
@@ -51,7 +53,7 @@ namespace Assets.PaperGameforge.Terminal
                 this.userInput = userInput;
             }
 
-            Text.text = this.directory + this.userInput;
+            Text.text = this.Directory + this.UserInput;
         }
         #endregion
     }

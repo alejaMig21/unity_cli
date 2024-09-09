@@ -1,6 +1,7 @@
 using Assets.PaperGameforge.Terminal.Services;
 using Assets.PaperGameforge.Terminal.Services.Responses;
 using Assets.PaperGameforge.Terminal.UI.CustomTMP;
+using System;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
@@ -19,6 +20,8 @@ namespace Assets.PaperGameforge.Terminal
         [SerializeField] private ScrollRect sr;
         [SerializeField] private GameObject msgList;
         private Interpreter interpreter;
+
+        private List<ProcessedLine> pLines = new();
         #endregion
 
         #region CONSTANTS
@@ -37,6 +40,11 @@ namespace Assets.PaperGameforge.Terminal
                 return interpreter;
             }
         }
+        public List<ProcessedLine> PLines { get => pLines; set => pLines = value; }
+        #endregion
+
+        #region EVENTS
+        public event Action OnLineProcessed;
         #endregion
 
         #region METHODS
@@ -106,7 +114,10 @@ namespace Assets.PaperGameforge.Terminal
             foreach (ProcessedLine child in line)
             {
                 child.CreateTextInfo(GetCurrentRenderedDirectory(), userInput);
+                pLines.Add(child);
             }
+
+            OnLineProcessed?.Invoke();
         }
         private int AddInterpreterLines(List<ServiceResponse> interpretation)
         {
@@ -170,6 +181,7 @@ namespace Assets.PaperGameforge.Terminal
                     Destroy(currentChild);
                 }
             }
+            pLines.Clear();
         }
         #endregion
     }
