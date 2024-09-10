@@ -5,3 +5,4 @@
 5-Optimizar las busquedas dentro del CSV (usar un arbol).
 6-Preparar la terminal para lidiar con archivos cuyo directorio tiene denegada la inspeccion.
 7-Optimizar la terminal (si se hacen muchas request los gameObjects comienzan a limitar el rendimiento)
+8-Desarrollar scrollbar que funcione unicamente con la rueda del mouse.
