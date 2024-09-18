@@ -9,6 +9,7 @@ namespace Assets.PaperGameforge.Terminal.Services
     [CreateAssetMenu(fileName = "TextFormatterService", menuName = "TerminalServices/DecoratorServices/TextFormatterService")]
     public class TextFormatterService : DecoratorService
     {
+        #region FIELDS
         [SerializeField]
         private List<SColorKey> colors = new()
         {
@@ -18,9 +19,13 @@ namespace Assets.PaperGameforge.Terminal.Services
             new("yellow", ColorManager.ParseColor("#f2f1b9")),
             new("blue", ColorManager.ParseColor("#9ed9d8")),
             new("purple", ColorManager.ParseColor("#d936ff")),
-            new("orange", ColorManager.ParseColor("#ef5847"))
+            new("orange", ColorManager.ParseColor("#ef5847")),
+            new("nfcp_intense_yellow", ColorManager.ParseColor("#ffca00")) // nfcp stands for "not from color palette"
         };
+        #endregion
 
+        #region CONSTANTS
+        // Constants for color keys
         private const string ERROR_CMD = "[ERROR]";
         private const string INFO_CMD = "[INFO]";
         private const string ERROR_COLOR = "red";
@@ -28,9 +33,14 @@ namespace Assets.PaperGameforge.Terminal.Services
         private const string INFO_COLOR = "blue";
         private const string INFO_BODY_COLOR = "yellow";
         private const string SPECIAL_COLOR = "purple";
+        private const string SIMPLE_RESPONSE_COLOR = "nfcp_intense_yellow";
+        #endregion
 
+        #region PROPERTIES
         public List<SColorKey> Colors { get => colors; set => colors = value; }
+        #endregion
 
+        #region METHODS
         public override List<ServiceResponse> ParseResponse(List<ServiceResponse> responses)
         {
             List<ServiceResponse> finalList = new();
@@ -62,6 +72,7 @@ namespace Assets.PaperGameforge.Terminal.Services
         {
             string[] args = response.Text.Split(TWO_DOTS_SEPARATOR);
 
+            // Possible special responses
             if (args.Length == 2)
             {
                 string header = args[0];
@@ -69,24 +80,38 @@ namespace Assets.PaperGameforge.Terminal.Services
 
                 switch (header)
                 {
+                    // Error case
                     case ERROR_CMD:
                         args[0] = ColorString(header, GetColor(ERROR_COLOR));
                         args[1] = ColorString(body, GetColor(ERROR_BODY_COLOR));
+                        response.Text = string.Join(' ', args);
                         break;
+                    // Information case
                     case INFO_CMD:
                         args[0] = ColorString(header, GetColor(INFO_COLOR));
                         args[1] = ColorString(body, GetColor(INFO_BODY_COLOR));
+                        response.Text = string.Join(' ', args);
+                        break;
+                    // Directory or simple response with 'TWO_DOTS_SEPARATOR' character
+                    default:
+                        response.Text = string.Join(':', args);
+                        response.Text = ColorString(response.Text, GetColor(SIMPLE_RESPONSE_COLOR));
                         break;
                 }
 
-                response.Text = string.Join(' ', args);
+                return new() { response };
+            }
 
+            // Plain text
+            if (response != null)
+            {
+                response.Text = ColorString(response.Text, GetColor(SIMPLE_RESPONSE_COLOR));
                 return new() { response };
             }
 
             return null;
         }
-        private string GetColor(string colorKey)
+        protected string GetColor(string colorKey)
         {
             SColorKey colorStruct = colors.Find(item => item.Key == colorKey);
 
@@ -103,5 +128,6 @@ namespace Assets.PaperGameforge.Terminal.Services
         {
             return ColorString(response, SPECIAL_COLOR);
         }
+        #endregion
     }
 }
