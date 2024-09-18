@@ -1,9 +1,10 @@
-﻿using TMPro;
+﻿using Assets.PaperGameforge.Terminal.UI.InfiniteScroller;
+using TMPro;
 using UnityEngine;
 
 namespace Assets.PaperGameforge.Terminal.UI.HierarchicalVisitor
 {
-    public class TerminalVisitor : HierarchicalVisitor<ProcessedLine>
+    public class TerminalVisitor : HierarchicalVisitor<ProcessedLineData>
     {
         #region FIELDS
         [SerializeField] private Terminal terminal;
@@ -24,7 +25,7 @@ namespace Assets.PaperGameforge.Terminal.UI.HierarchicalVisitor
                 }
             }
         }
-        public override ProcessedLine SelectedElement
+        public override ProcessedLineData SelectedElement
         {
             get => selectedElement;
             set

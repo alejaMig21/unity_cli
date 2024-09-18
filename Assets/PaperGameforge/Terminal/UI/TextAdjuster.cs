@@ -9,7 +9,6 @@ namespace Assets.PaperGameforge.Terminal.UI
         #region FIELDS
         private RectTransform rt;
         private TextMeshProUGUI text;
-        [SerializeField] private bool adjustFromStart = false;
         #endregion
 
         #region PROPERTIES
@@ -38,12 +37,13 @@ namespace Assets.PaperGameforge.Terminal.UI
         #endregion
 
         #region METHODS
+        private void Awake()
+        {
+            SubscribeAdjustment();
+        }
         private void Start()
         {
-            if (adjustFromStart)
-            {
-                SubscribeAdjustment();
-            }
+            AdjustSize();
         }
         private void OnDestroy()
         {

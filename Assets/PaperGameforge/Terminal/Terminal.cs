@@ -1,11 +1,12 @@
 using Assets.PaperGameforge.Terminal.Services;
 using Assets.PaperGameforge.Terminal.Services.Responses;
 using Assets.PaperGameforge.Terminal.UI.CustomTMP;
+using Assets.PaperGameforge.Terminal.UI.InfiniteScroller;
+using Gpm.Ui;
 using System;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
-using UnityEngine.UI;
 
 namespace Assets.PaperGameforge.Terminal
 {
@@ -13,15 +14,12 @@ namespace Assets.PaperGameforge.Terminal
     public class Terminal : MonoBehaviour
     {
         #region FIELDS
-        [SerializeField] private GameObject processedLine;
-        [SerializeField] private GameObject responseLine;
         [SerializeField] private TMP_InputField terminalInput;
         [SerializeField] private GameObject userInputLine;
-        [SerializeField] private ScrollRect sr;
-        [SerializeField] private GameObject msgList;
+        [SerializeField] private InfiniteScroll scroller;
         private Interpreter interpreter;
 
-        private List<ProcessedLine> pLines = new();
+        private List<ProcessedLineData> pLines = new();
         #endregion
 
         #region CONSTANTS
@@ -40,7 +38,7 @@ namespace Assets.PaperGameforge.Terminal
                 return interpreter;
             }
         }
-        public List<ProcessedLine> PLines { get => pLines; set => pLines = value; }
+        public List<ProcessedLineData> PLines { get => pLines; set => pLines = value; }
         #endregion
 
         #region EVENTS
@@ -61,12 +59,6 @@ namespace Assets.PaperGameforge.Terminal
                 }
             }
         }
-        private void Start()
-        {
-            //AddInterpreterLines(_Interpreter.Interpret("ascii"));
-            // Move the user input line to the end.
-            userInputLine.transform.SetAsLastSibling();
-        }
         private void OnGUI()
         {
             if (terminalInput.isFocused && terminalInput.text != "" && Input.GetKeyDown(KeyCode.Return))
@@ -81,13 +73,7 @@ namespace Assets.PaperGameforge.Terminal
                 AddDirectoryLine(userInput);
 
                 // Add the interpretation lines.
-                int lines = AddInterpreterLines(_Interpreter.Interpret(userInput));
-
-                // Scroll to the bottom of the scrollRect.
-                ScrollToBottom(lines);
-
-                // Move the user input line to the end.
-                userInputLine.transform.SetAsLastSibling();
+                AddInterpreterLines(_Interpreter.Interpret(userInput));
 
                 // Refocus the input field.
                 terminalInput.ActivateInputField();
@@ -100,22 +86,11 @@ namespace Assets.PaperGameforge.Terminal
         }
         private void AddDirectoryLine(string userInput)
         {
-            // Resizing the command line container, so the scrollRect doesn't throw a fit.
-            Vector2 msgListSize = msgList.GetComponent<RectTransform>().sizeDelta;
-            msgList.GetComponent<RectTransform>().sizeDelta = new(msgListSize.x, msgListSize.y + PIXELS_PER_LINE);
+            ProcessedLineData data = new(GetCurrentRenderedDirectory(), userInput);
 
-            // Instantiate the directory line.
-            GameObject msg = Instantiate(processedLine, msgList.transform);
+            scroller.InsertData(data);
 
-            // Set its child index
-            msg.transform.SetSiblingIndex(msgList.transform.childCount - 1);
-
-            var line = msg.GetComponentsInChildren<ProcessedLine>();
-            foreach (ProcessedLine child in line)
-            {
-                child.CreateTextInfo(GetCurrentRenderedDirectory(), userInput);
-                pLines.Add(child);
-            }
+            pLines.Add(data);
 
             OnLineProcessed?.Invoke();
         }
@@ -125,32 +100,13 @@ namespace Assets.PaperGameforge.Terminal
 
             for (int i = 0; i < interpretation.Count; i++)
             {
-                // Instantiate the responses line.
-                GameObject res = Instantiate(responseLine, msgList.transform);
-
-                // Set it to the end of all the messages.
-                res.transform.SetAsLastSibling();
-
-                // Get the size of the message list, and resize.
-                Vector2 listSize = msgList.GetComponent<RectTransform>().sizeDelta;
-                msgList.GetComponent<RectTransform>().sizeDelta = new(listSize.x, listSize.y + PIXELS_PER_LINE);
-
-                // Set the dirText of this responses line to be whatever the interpreter string is.
-                res.GetComponentInChildren<TextMeshProUGUI>().text = interpretation[i].Text;
+                if (!interpretation[i].BackgroundProcess)
+                {
+                    scroller.InsertData(new TerminalData(interpretation[i].Text));
+                }
             }
 
             return interpretation.Count;
-        }
-        private void ScrollToBottom(int lines)
-        {
-            if (lines > 4)
-            {
-                sr.velocity = new(0, 8000);
-            }
-            else
-            {
-                sr.verticalNormalizedPosition = 0; // The bottom of the scrollRect
-            }
         }
         private string GetCurrentRenderedDirectory()
         {
@@ -167,21 +123,12 @@ namespace Assets.PaperGameforge.Terminal
         }
         private void ClearTerminal()
         {
-            if (msgList != null)
-            {
-                for (int i = 0; i < msgList.transform.childCount; i++)
-                {
-                    GameObject currentChild = msgList.transform.GetChild(i).gameObject;
+            scroller.Clear();
 
-                    if (currentChild == userInputLine)
-                    {
-                        continue;
-                    }
-
-                    Destroy(currentChild);
-                }
-            }
-            pLines.Clear();
+            /// Line below uncommented to achieve os cli behavior.
+            /// Even after clearing a console, previous commands should be reachable.
+            /// Uncomment if you are not interested in this behavior.
+            //pLines.Clear();
         }
         #endregion
     }
