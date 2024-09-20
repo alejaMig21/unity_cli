@@ -15,8 +15,11 @@ ascii,,,,,,,,,,,,,,,,,,<DMETHOD>:LoadTitle
 ERROR,,,,,,,,,,,,,,,,,,[ERROR]:Somethig went wrong
 ,NOT_FOUND,,,,,,,,,,,,,,,,,[ERROR]:Command not recognized. Type help for a list of commands
 ,DIR_NOT_FOUND,,,,,,,,,,,,,,,,,[ERROR]:Directory not found
+,SOURCE_NOT_FOUND,,,,,,,,,,,,,,,,,[ERROR]:Source directory not found
+,DEST_NOT_FOUND,,,,,,,,,,,,,,,,,[ERROR]:Destination directory not found
+,CONFLICT_DEST_FILES,,,,,,,,,,,,,,,,,[ERROR]:Conflict found on destination. Some files already exists on destination directory.
 clear,,,,,,,,,,,,,,,,,,<DMETHOD>:Clear
-cd,,,,,,,,,,,,,,,,,,
+cd,,,,,,,,,,,,,,,,,,[ERROR]:A directory must be specified after the change directory (cd) command
 ,dir,,,,,,,,,,,,,,,,,<IMETHOD>:LoadFolders
 ,,all,,,,,,,,,,,,,,,,<IMETHOD>:LoadDirectories
 close,,,,,,,,,,,,,,,,,,<DMETHOD>:CloseTerminal

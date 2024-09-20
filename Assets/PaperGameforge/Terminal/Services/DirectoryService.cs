@@ -8,14 +8,14 @@ namespace Assets.PaperGameforge.Terminal.Services
     [CreateAssetMenu(fileName = "DirectoryService", menuName = "TerminalServices/InterpreterServices/DirectoryService")]
     public class DirectoryService : InterpreterService
     {
-
         private readonly ErrorKey errorDirCmd = new("ERROR DIR_NOT_FOUND");
+        private readonly ErrorKey errorIncompleteCmd = new("cd");
         private FileManager fileManager;
 
         private const string CHANGE_DIR_COMMAND = "cd";
         private const string PREVIOUS_DIR_COMMAND = "..";
         private const char WHITE_SAPACE_SEPARATOR = ' ';
-        private const int ERROR_PRIORITY = 9;
+        private const int ERROR_PRIORITY = 8;
 
         public void SetUpValues(FileManager fileManager)
         {
@@ -25,19 +25,26 @@ namespace Assets.PaperGameforge.Terminal.Services
         {
             string[] dirArgs = userInput.Split(WHITE_SAPACE_SEPARATOR);
 
-            if (dirArgs[0] == CHANGE_DIR_COMMAND)
+            if (dirArgs.Length == 2)
             {
-                // Join all arguments after the command into a single string for the directory
-                string dir = string.Join(WHITE_SAPACE_SEPARATOR, dirArgs.Skip(1));
-
-                (bool exists, string _) = ChangeDirectory(dir, fileManager);
-
-                if (!exists) // If it does not exists
+                if (dirArgs[0] == CHANGE_DIR_COMMAND)
                 {
-                    return new() { new ServiceError(errorDirCmd.Cmd, false, ERROR_PRIORITY) }; // Launch error
-                }
+                    // Join all arguments after the command into a single string for the directory
+                    string dir = string.Join(WHITE_SAPACE_SEPARATOR, dirArgs.Skip(1));
 
-                return new() { new(string.Empty, true) }; // Else do not launch error
+                    (bool exists, string _) = ChangeDirectory(dir, fileManager);
+
+                    if (!exists) // If it does not exists
+                    {
+                        return new() { new ServiceError(errorDirCmd.Cmd, false, ERROR_PRIORITY) }; // Launch error
+                    }
+
+                    return new() { new(string.Empty, true) }; // Else do not launch error
+                }
+            }
+            else if (dirArgs.Length == 1 && dirArgs[0] == CHANGE_DIR_COMMAND)
+            {
+                return new() { new ServiceError(errorIncompleteCmd.Cmd, false, ERROR_PRIORITY) }; // Launch error
             }
 
             return null; // Launch error

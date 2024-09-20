@@ -39,6 +39,9 @@ namespace Assets.PaperGameforge.Terminal
                     case DirectoryService directoryService:
                         directoryService.SetUpValues(_FileManager);
                         break;
+                    case CopierService copierService:
+                        copierService.SetUpValues(_FileManager);
+                        break;
                     case MethodExecuterService methodExecuterService:
                         methodExecuterService.SetUpValues(GetServices());
                         break;

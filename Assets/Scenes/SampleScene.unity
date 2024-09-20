@@ -1997,6 +1997,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   interpreterServices:
   - {fileID: 11400000, guid: b7acee9f2dda01b4c9543e83d264a7bd, type: 2}
+  - {fileID: 11400000, guid: 12b1401297fbacb46952316515129f07, type: 2}
   - {fileID: 11400000, guid: 3b0a5087cfbd9b3439065643babbffbb, type: 2}
   decoratorServices:
   - {fileID: 11400000, guid: 196a7814e12a0c2449c2c5f6c0f4dff6, type: 2}

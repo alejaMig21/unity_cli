@@ -1,8 +1,20 @@
 1-Poder copiar y pegar directorios.
 2-Poder escribir en el CSV de los comandos de la terminal.
 3-Poder "instalar" paquetes (se escrbiran nuevas celdas en el CSV).
+
+--- formato de instalacion ---
+csv_name
+{
+	dictionary /// command
+	{
+		dictionary[] /// list of possible commands
+		response[] /// list of responses
+	}
+	class or directory with classes /// buscar si se pueden inyectar clases en un juego ya empaquetado (lo dudo)
+	{
+	}
+}
+
 4-Poder crear entornos virtuales (sera crear nuevos CSV en blanco).
 5-Optimizar las busquedas dentro del CSV (usar un arbol).
 6-Preparar la terminal para lidiar con archivos cuyo directorio tiene denegada la inspeccion.
-7-Optimizar la terminal (si se hacen muchas request los gameObjects comienzan a limitar el rendimiento)
-8-Desarrollar scrollbar que funcione unicamente con la rueda del mouse.
