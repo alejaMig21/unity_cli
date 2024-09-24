@@ -1,6 +1,8 @@
 ﻿using Assets.PaperGameforge.Terminal.UI.CustomTMP;
+using System.Collections;
 using System.Collections.Generic;
 using System.IO;
+using System.Threading.Tasks;
 using UnityEngine;
 
 namespace Assets.PaperGameforge.Terminal
@@ -112,13 +114,6 @@ namespace Assets.PaperGameforge.Terminal
             }
             return (exists, path);
         }
-        /// <summary>
-        /// Copies the content of a directory or file to the destination.
-        /// </summary>
-        /// <param name="source">The source directory or file to copy.</param>
-        /// <param name="destination">The destination where the content will be copied.</param>
-        /// <param name="hard">If true, creates the destination directory if it does not exist.</param>
-        /// <returns>A tuple indicating whether the source and destination exist.</returns>
         public (bool sourceExists, bool destExists) Copy(string source, string destination, bool hard = false)
         {
             if (File.Exists(source))
@@ -127,18 +122,14 @@ namespace Assets.PaperGameforge.Terminal
             }
             else if (Directory.Exists(source))
             {
-                return CopyDirectory(source, destination, hard);
+                // Llamar al método asíncrono para copiar directorios
+                StartCoroutine(CopyDirectoryAsync(source, destination, hard));
+                return (true, true);
             }
 
             return (false, false);
         }
-        /// <summary>
-        /// Copies a file to the destination.
-        /// </summary>
-        /// <param name="sourceFile">The source file to copy.</param>
-        /// <param name="destination">The destination where the file will be copied.</param>
-        /// <param name="hard">If true, creates the destination directory if it does not exist.</param>
-        /// <returns>A tuple indicating whether the source file and destination exist.</returns>
+
         private (bool sourceExists, bool destExists) CopyFile(string sourceFile, string destination, bool hard = false)
         {
             if (!File.Exists(sourceFile))
@@ -158,24 +149,53 @@ namespace Assets.PaperGameforge.Terminal
                 }
             }
 
-            // Copy the file to the destination
             string targetFilePath = System.IO.Path.Combine(destination, System.IO.Path.GetFileName(sourceFile));
-            File.Copy(sourceFile, targetFilePath, overwrite: true);
+            StartCoroutine(CopyFileAsync(sourceFile, targetFilePath));
 
             return (true, true);
         }
-        /// <summary>
-        /// Copies a directory and its contents to the destination.
-        /// </summary>
-        /// <param name="sourceDirectory">The source directory to copy.</param>
-        /// <param name="destination">The destination where the directory will be copied.</param>
-        /// <param name="hard">If true, creates the destination directory if it does not exist.</param>
-        /// <returns>A tuple indicating whether the source and destination directories exist.</returns>
-        private (bool sourceExists, bool destExists) CopyDirectory(string sourceDirectory, string destination, bool hard = false)
+        private IEnumerator CopyFileAsync(string file, string targetFilePath)
+        {
+            Debug.Log("Copy started...");
+
+            // Ejecutar la operación de copia en un hilo separado
+            Task copyTask = Task.Run(() => File.Copy(file, targetFilePath, overwrite: true));
+
+            // Esperar a que la tarea termine sin bloquear el hilo principal
+            yield return new WaitUntil(() => copyTask.IsCompleted);
+
+            if (copyTask.IsFaulted)
+            {
+                Debug.LogError("Error during copy: " + copyTask.Exception);
+            }
+            else
+            {
+                Debug.Log("File copied successfully.");
+            }
+        }
+        private IEnumerator CopyDirectoryAsync(string sourceDirectory, string destination, bool hard = false)
+        {
+            Debug.Log("Directory copy started...");
+
+            Task copyTask = Task.Run(() => CopyDirectory(sourceDirectory, destination, hard));
+
+            // Esperar a que la tarea de copia termine sin bloquear el hilo principal
+            yield return new WaitUntil(() => copyTask.IsCompleted);
+
+            if (copyTask.IsFaulted)
+            {
+                Debug.LogError("Error during directory copy: " + copyTask.Exception);
+            }
+            else
+            {
+                Debug.Log("Directory copied successfully.");
+            }
+        }
+        private void CopyDirectory(string sourceDirectory, string destination, bool hard)
         {
             if (!Directory.Exists(sourceDirectory))
             {
-                return (false, true); // Source directory does not exist
+                return; // Source directory does not exist
             }
 
             if (!Directory.Exists(destination))
@@ -186,28 +206,23 @@ namespace Assets.PaperGameforge.Terminal
                 }
                 else
                 {
-                    return (true, false); // Destination directory does not exist
+                    return; // Destination directory does not exist
                 }
             }
 
-            // Create the new directory inside the destination
             string newDestinationDir = System.IO.Path.Combine(destination, System.IO.Path.GetFileName(sourceDirectory));
             Directory.CreateDirectory(newDestinationDir);
 
-            // Copy files in the source directory
             foreach (var file in Directory.GetFiles(sourceDirectory))
             {
                 string targetFilePath = System.IO.Path.Combine(newDestinationDir, System.IO.Path.GetFileName(file));
-                File.Copy(file, targetFilePath, overwrite: true);
+                File.Copy(file, targetFilePath, overwrite: true);  // Copiar archivos de forma sincrónica dentro del hilo separado
             }
 
-            // Copy subdirectories recursively
             foreach (var subDir in Directory.GetDirectories(sourceDirectory))
             {
-                CopyDirectory(subDir, newDestinationDir, hard);
+                CopyDirectory(subDir, newDestinationDir, hard);  // Recursión para subdirectorios
             }
-
-            return (true, true);
         }
         #endregion
     }
