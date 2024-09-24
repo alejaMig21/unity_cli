@@ -82,20 +82,20 @@ namespace Assets.PaperGameforge.Terminal.Services
                 {
                     // Error case
                     case ERROR_CMD:
-                        args[0] = ColorString(header, GetColor(ERROR_COLOR));
-                        args[1] = ColorString(body, GetColor(ERROR_BODY_COLOR));
+                        args[0] = ColorManager.ColorString(header, GetColor(ERROR_COLOR));
+                        args[1] = ColorManager.ColorString(body, GetColor(ERROR_BODY_COLOR));
                         response.Text = string.Join(' ', args);
                         break;
                     // Information case
                     case INFO_CMD:
-                        args[0] = ColorString(header, GetColor(INFO_COLOR));
-                        args[1] = ColorString(body, GetColor(INFO_BODY_COLOR));
+                        args[0] = ColorManager.ColorString(header, GetColor(INFO_COLOR));
+                        args[1] = ColorManager.ColorString(body, GetColor(INFO_BODY_COLOR));
                         response.Text = string.Join(' ', args);
                         break;
                     // Directory or simple response with 'TWO_DOTS_SEPARATOR' character
                     default:
                         response.Text = string.Join(':', args);
-                        response.Text = ColorString(response.Text, GetColor(SIMPLE_RESPONSE_COLOR));
+                        response.Text = ColorManager.ColorString(response.Text, GetColor(SIMPLE_RESPONSE_COLOR));
                         break;
                 }
 
@@ -105,7 +105,7 @@ namespace Assets.PaperGameforge.Terminal.Services
             // Plain text
             if (response != null)
             {
-                response.Text = ColorString(response.Text, GetColor(SIMPLE_RESPONSE_COLOR));
+                response.Text = ColorManager.ColorString(response.Text, GetColor(SIMPLE_RESPONSE_COLOR));
                 return new() { response };
             }
 
@@ -117,16 +117,9 @@ namespace Assets.PaperGameforge.Terminal.Services
 
             return "#" + ColorManager.ParseHex(colorStruct.Color);
         }
-        public string ColorString(string s, string color)
-        {
-            string leftTag = "<color=" + color + ">";
-            string rightTag = "</color>";
-
-            return leftTag + s + rightTag;
-        }
         public string DecorateSpecialResponse(string response)
         {
-            return ColorString(response, SPECIAL_COLOR);
+            return ColorManager.ColorString(response, SPECIAL_COLOR);
         }
         #endregion
     }

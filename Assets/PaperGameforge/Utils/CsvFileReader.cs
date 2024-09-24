@@ -10,7 +10,7 @@ namespace Assets.PaperGameforge.Utils
     public static class CsvFileReader
     {
         /// <summary>
-        /// Reads the entire CSV and returns a list of rows as dictionaries (header -> value)
+        /// Reads the entire CSV and returns a list of rows as dictionaries (header -> percentValue)
         /// </summary>
         /// <param name="fileName"></param>
         /// <returns></returns>

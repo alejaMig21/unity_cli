@@ -20,5 +20,12 @@ namespace Assets.PaperGameforge.Terminal.Managers
         {
             return ColorUtility.ToHtmlStringRGBA(color);
         }
+        public static string ColorString(string s, string color)
+        {
+            string leftTag = "<color=" + color + ">";
+            string rightTag = "</color>";
+
+            return leftTag + s + rightTag;
+        }
     }
 }

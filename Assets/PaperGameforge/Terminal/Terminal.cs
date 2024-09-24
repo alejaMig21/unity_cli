@@ -118,7 +118,7 @@ namespace Assets.PaperGameforge.Terminal
                 Debug.LogWarning("\'userInputLine\' has more than one children with \'DirectoryTextUGUI\' components.\nThe first one will only be returned out of simplicity!");
             }
 #endif
-            // Returns the first DirectoryTextUGUI dirText value found on the UserInputLine
+            // Returns the first DirectoryTextUGUI dirText percentValue found on the UserInputLine
             return directories[0].text;
         }
         private void ClearTerminal()
