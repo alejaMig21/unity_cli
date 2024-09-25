@@ -67,7 +67,7 @@ namespace Assets.PaperGameforge.Terminal
                 if (serviceResponses.All(item => item is not ServiceError))
                 {
                     Responses.AddRange(serviceResponses);
-                    break; // Detener la iteración si un servicio interpretó el input
+                    break; // Stop iteration if a service interpreted the input
                 }
                 else
                 {
