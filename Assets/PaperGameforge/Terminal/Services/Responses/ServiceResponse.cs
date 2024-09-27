@@ -1,5 +1,8 @@
-﻿namespace Assets.PaperGameforge.Terminal.Services.Responses
+﻿using System;
+
+namespace Assets.PaperGameforge.Terminal.Services.Responses
 {
+    [Serializable]
     public class ServiceResponse
     {
         private string text = string.Empty;

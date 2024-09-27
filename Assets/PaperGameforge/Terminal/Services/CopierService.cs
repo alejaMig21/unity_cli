@@ -1,4 +1,5 @@
 ﻿using Assets.PaperGameforge.Terminal.Services.Responses;
+using Assets.PaperGameforge.Terminal.UI.CustomSliders;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -11,6 +12,7 @@ namespace Assets.PaperGameforge.Terminal.Services
         private readonly ErrorKey errorDestCmd = new("ERROR DEST_NOT_FOUND");
         private readonly ErrorKey errorConflictFilesCmd = new("ERROR CONFLICT_DEST_FILES");
         private FileManager fileManager;
+        [SerializeField] private TextBar textBar;
 
         private const string MOVE_DIR_COMMAND = "move";
         private const string HARD_COMMAND = "--hard";
@@ -32,7 +34,7 @@ namespace Assets.PaperGameforge.Terminal.Services
                     // Check for hard executions
                     bool hard = dirArgs[dirArgs.Length - 1] == HARD_COMMAND;
 
-                    (bool sourceExists, bool destExists) = fileManager.Copy(dirArgs[1], dirArgs[2], hard);
+                    (bool sourceExists, bool destExists) = fileManager.Copier.Copy(dirArgs[1], dirArgs[2], hard);
 
                     if (!sourceExists)
                     {
@@ -42,12 +44,13 @@ namespace Assets.PaperGameforge.Terminal.Services
                     {
                         return new() { new ServiceError(errorDestCmd.Cmd, false, ERROR_PRIORITY) }; // Launch error
                     }
-                    //if (conflict)
-                    //{
-                    //    return new() { new ServiceError(errorConflictFilesCmd.Cmd, false, ERROR_PRIORITY) }; // Launch error
-                    //}
 
-                    return new() { new(string.Empty, true) }; // Else do not launch error
+                    var operation = dirArgs[1] + " -> " + dirArgs[2];
+
+                    return new() {
+                        new(operation, false),
+                        new ProgressResponse(textBar, fileManager.Copier, false)
+                    }; // Else do not launch error
                 }
             }
 

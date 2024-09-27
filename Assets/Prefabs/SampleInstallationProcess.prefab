@@ -149,18 +149,31 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 35ff21983ef9e554b96107ee0744edcc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  completedChar: 9608
-  uncompletedChar: 9617
-  textLength: 60
-  completedColor:
-    key: green
-    color: {r: 0.40392157, g: 1, b: 0.4627451, a: 1}
-  uncompletedColor:
-    key: red
-    color: {r: 0.8862745, g: 0.25882354, b: 0.2901961, a: 1}
-  minValue: 0
-  maxValue: 1
-  percentValue: 0.15
-  onValueChanged:
-    m_PersistentCalls:
-      m_Calls: []
+  bar:
+    completedChar: 9608
+    uncompletedChar: 9617
+    textLength: 25
+    completedColor:
+      key: green
+      color: {r: 0.40392157, g: 1, b: 0.4627451, a: 1}
+    uncompletedColor:
+      key: red
+      color: {r: 0.8862745, g: 0.25882354, b: 0.2901961, a: 1}
+    minValue: 0
+    maxValue: 1
+    percentValue: 0.25
+    onValueChanged:
+      m_PersistentCalls:
+        m_Calls:
+        - m_Target: {fileID: 8366011345581520312}
+          m_TargetAssemblyTypeName: 
+          m_MethodName: 
+          m_Mode: 0
+          m_Arguments:
+            m_ObjectArgument: {fileID: 0}
+            m_ObjectArgumentAssemblyTypeName: 
+            m_IntArgument: 0
+            m_FloatArgument: 0
+            m_StringArgument: 
+            m_BoolArgument: 0
+          m_CallState: 2

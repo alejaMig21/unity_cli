@@ -1,6 +1,5 @@
-1-Poder copiar y pegar directorios.
-2-Poder escribir en el CSV de los comandos de la terminal.
-3-Poder "instalar" paquetes (se escrbiran nuevas celdas en el CSV).
+1-Poder escribir en el CSV de los comandos de la terminal.
+2-Poder "instalar" paquetes (se escrbiran nuevas celdas en el CSV).
 
 --- formato de instalacion ---
 csv_name
@@ -15,6 +14,6 @@ csv_name
 	}
 }
 
-4-Poder crear entornos virtuales (sera crear nuevos CSV en blanco).
-5-Optimizar las busquedas dentro del CSV (usar un arbol).
-6-Preparar la terminal para lidiar con archivos cuyo directorio tiene denegada la inspeccion.
+3-Poder crear entornos virtuales (sera crear nuevos CSV en blanco).
+4-Optimizar las busquedas dentro del CSV (usar un arbol).
+5-Preparar la terminal para lidiar con archivos cuyo directorio tiene denegada la inspeccion.

@@ -12,3 +12,19 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 26a6de4fb88487846850a50f20bf5b26, type: 3}
   m_Name: CopierService
   m_EditorClassIdentifier: 
+  textBar:
+    completedChar: 9608
+    uncompletedChar: 9617
+    textLength: 50
+    completedColor:
+      key: blue
+      color: {r: 0.61960787, g: 0.8509804, b: 0.84705883, a: 1}
+    uncompletedColor:
+      key: red
+      color: {r: 1, g: 0.34509805, b: 0.4745098, a: 1}
+    minValue: 0
+    maxValue: 1
+    percentValue: 0.5
+    onValueChanged:
+      m_PersistentCalls:
+        m_Calls: []

@@ -18,8 +18,9 @@ namespace Assets.PaperGameforge.Terminal
         [SerializeField] private GameObject userInputLine;
         [SerializeField] private InfiniteScroll scroller;
         private Interpreter interpreter;
-
         private List<ProcessedLineData> pLines = new();
+        private List<ServiceResponse> responses = new();
+        private bool blockedTerminal = false;
         #endregion
 
         #region CONSTANTS
@@ -39,6 +40,7 @@ namespace Assets.PaperGameforge.Terminal
             }
         }
         public List<ProcessedLineData> PLines { get => pLines; set => pLines = value; }
+        public List<ServiceResponse> Responses { get => responses; set => responses = value; }
         #endregion
 
         #region EVENTS
@@ -75,9 +77,48 @@ namespace Assets.PaperGameforge.Terminal
                 // Add the interpretation lines.
                 AddInterpreterLines(_Interpreter.Interpret(userInput));
 
-                // Refocus the input field.
-                terminalInput.ActivateInputField();
-                terminalInput.Select();
+                scroller.MoveToLastData();
+
+                HandleCopies();
+
+                ResetTerminalInput();
+            }
+        }
+        /// <summary>
+        /// Refocus the input field.
+        /// </summary>
+        private void ResetTerminalInput()
+        {
+            if (blockedTerminal)
+            {
+                terminalInput.interactable = false;
+                return;
+            }
+
+            terminalInput.interactable = true;
+            terminalInput.ActivateInputField();
+            terminalInput.Select();
+        }
+        private void HandleCopies()
+        {
+            if (responses.Count > 0)
+            {
+                int count = responses.Count;
+                ProgressResponse lastResponse =
+                    responses[count - 1] != null && responses[count - 1] is ProgressResponse ?
+                    responses[count - 1] as ProgressResponse :
+                    null;
+
+                if (lastResponse != null)
+                {
+                    lastResponse.OnProgressStarted += () => blockedTerminal = true;
+                    lastResponse.OnProgressFinished += () =>
+                    {
+                        blockedTerminal = false;
+                        ResetTerminalInput();
+                    };
+                    StartCoroutine(lastResponse.SimulateProgress(scroller));
+                }
             }
         }
         private void ClearInputField()
@@ -102,6 +143,9 @@ namespace Assets.PaperGameforge.Terminal
             {
                 if (!interpretation[i].BackgroundProcess)
                 {
+                    // Tracks all of the interpretations received
+                    responses.Add(interpretation[i]);
+
                     scroller.InsertData(new TerminalData(interpretation[i].Text));
                 }
             }
@@ -124,6 +168,8 @@ namespace Assets.PaperGameforge.Terminal
         private void ClearTerminal()
         {
             scroller.Clear();
+
+            responses.Clear();
 
             /// Line below uncommented to achieve os cli behavior.
             /// Even after clearing a console, previous commands should be reachable.
