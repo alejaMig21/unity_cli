@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections;
+﻿using System.Collections;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
@@ -13,9 +12,9 @@ namespace Assets.PaperGameforge.Terminal.UI.CustomSliders
         private float percentageProgress = 0f;
         private float currentSize = 0f;
         private float totalSize = 0f;
-        private float currentSpeed = 0f;
-        private DateTime remainingTime = DateTime.MinValue;
+        private (double size, string unit) currentSpeed;
         private static readonly byte[] buffer = new byte[1024 * 1024]; // Shared 1 MB buffer to avoid reallocation
+        private long lastBytesCopied = 0; // To track bytes copied in the last second
         #endregion
 
         #region PROPERTIES
@@ -47,26 +46,19 @@ namespace Assets.PaperGameforge.Terminal.UI.CustomSliders
                 }
             }
         }
-        public float CurrentSpeed
+        public string CurrentSpeed
         {
-            get => currentSpeed;
-            set => currentSpeed = value;
-        }
-        public DateTime RemainingTime
-        {
-            get => remainingTime;
-            set => remainingTime = value;
+            get => $"{currentSpeed.size:F2}{currentSpeed.unit}";
         }
         #endregion
 
         #region CONSTRUCTORS
-        public InGameCopier(float percentageProgress, float currentSize, float totalSize, float currentSpeed, DateTime spendedTime)
+        public InGameCopier(float percentageProgress, float currentSize, float totalSize, float currentSpeed)
         {
             this.percentageProgress = percentageProgress;
             this.currentSize = currentSize;
             this.totalSize = totalSize;
-            this.currentSpeed = currentSpeed;
-            this.remainingTime = spendedTime;
+            this.currentSpeed = (0, "Bytes");
         }
         #endregion
 
@@ -87,7 +79,7 @@ namespace Assets.PaperGameforge.Terminal.UI.CustomSliders
         private string FormatSizeReadable(float size)
         {
             var readableSize = Utils.ByteConverter.GetReadableSize((long)size);
-            return $"{readableSize.size:F2} {readableSize.unit}";
+            return $"{readableSize.size:F2}{readableSize.unit}";
         }
         private (bool, bool) CopyFile(string source, string destination, bool overwrite)
         {
@@ -144,8 +136,7 @@ namespace Assets.PaperGameforge.Terminal.UI.CustomSliders
                     destinationStream.Write(buffer, 0, bytesRead);
                     totalBytesCopied += bytesRead;
 
-                    CurrentSize = totalBytesCopied;
-                    PercentageProgress = totalBytesCopied / TotalSize;
+                    UpdateProgress(totalBytesCopied);
 
                     yield return null; // Wait for the next frame to continue
                 }
@@ -168,8 +159,7 @@ namespace Assets.PaperGameforge.Terminal.UI.CustomSliders
 
             while (!directoryCopyTask.IsCompleted)
             {
-                CurrentSize = totalBytesCopied;
-                PercentageProgress = totalBytesCopied / TotalSize;
+                UpdateProgress(totalBytesCopied);
                 yield return null;
             }
 
@@ -218,6 +208,17 @@ namespace Assets.PaperGameforge.Terminal.UI.CustomSliders
         {
             return Directory.GetFiles(directory, "*", SearchOption.AllDirectories)
                             .Sum(file => new FileInfo(file).Length);
+        }
+        private void UpdateProgress(long totalBytesCopied)
+        {
+            CurrentSize = totalBytesCopied;
+            PercentageProgress = totalBytesCopied / TotalSize;
+
+            // Update speed
+            long bytesCopiedThisSecond = totalBytesCopied - lastBytesCopied;
+            lastBytesCopied = totalBytesCopied;
+
+            currentSpeed = Utils.ByteConverter.GetReadableSize(bytesCopiedThisSecond);
         }
         #endregion
     }
