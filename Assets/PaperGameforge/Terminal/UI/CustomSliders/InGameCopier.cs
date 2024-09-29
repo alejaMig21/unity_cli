@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 using UnityEngine;
 
@@ -13,19 +14,15 @@ namespace Assets.PaperGameforge.Terminal.UI.CustomSliders
         private float currentSize = 0f;
         private float totalSize = 0f;
         private float currentSpeed = 0f;
-        private DateTime spendedTime = DateTime.MinValue;
+        private DateTime remainingTime = DateTime.MinValue;
+        private static readonly byte[] buffer = new byte[1024 * 1024]; // Shared 1 MB buffer to avoid reallocation
         #endregion
 
         #region PROPERTIES
         public float PercentageProgress
         {
             get => percentageProgress;
-            private set
-            {
-                percentageProgress = Mathf.Clamp01(value);
-                // Here you can update UI elements, for example:
-                //Debug.Log($"Progress: {percentageProgress * 100}%");
-            }
+            private set => percentageProgress = Mathf.Clamp01(value);
         }
         public string CurrentSizeReadable { get; private set; }
         public string TotalSizeReadable { get; private set; }
@@ -35,8 +32,7 @@ namespace Assets.PaperGameforge.Terminal.UI.CustomSliders
             private set
             {
                 currentSize = value;
-                var readableSize = Utils.ByteConverter.GetReadableSize((long)currentSize);
-                CurrentSizeReadable = $"{readableSize.size:F2} {readableSize.unit}";
+                CurrentSizeReadable = FormatSizeReadable(currentSize);
             }
         }
         public float TotalSize
@@ -47,132 +43,170 @@ namespace Assets.PaperGameforge.Terminal.UI.CustomSliders
                 if (value > 0f)
                 {
                     totalSize = value;
-                    var readableSize = Utils.ByteConverter.GetReadableSize((long)totalSize);
-                    TotalSizeReadable = $"{readableSize.size:F2} {readableSize.unit}";
+                    TotalSizeReadable = FormatSizeReadable(totalSize);
                 }
             }
         }
-        public float CurrentSpeed { get => currentSpeed; set => currentSpeed = value; }
-        public DateTime SpendedTime { get => spendedTime; set => spendedTime = value; }
+        public float CurrentSpeed
+        {
+            get => currentSpeed;
+            set => currentSpeed = value;
+        }
+        public DateTime RemainingTime
+        {
+            get => remainingTime;
+            set => remainingTime = value;
+        }
         #endregion
 
-        #region CONSTRUCTOR
+        #region CONSTRUCTORS
         public InGameCopier(float percentageProgress, float currentSize, float totalSize, float currentSpeed, DateTime spendedTime)
         {
             this.percentageProgress = percentageProgress;
             this.currentSize = currentSize;
             this.totalSize = totalSize;
             this.currentSpeed = currentSpeed;
-            this.spendedTime = spendedTime;
+            this.remainingTime = spendedTime;
         }
         #endregion
 
         #region METHODS
-        public (bool sourceExists, bool destExists) Copy(string source, string destination, bool hard = false)
+        public (bool sourceExists, bool destExists) Copy(string source, string destination, bool overwrite = false)
         {
             if (File.Exists(source))
             {
-                var copyResult = ValidateAndPrepareFile(source, destination, hard);
-                if (copyResult == (true, true))
-                {
-                    CopyFile(source, destination);
-                }
-                return copyResult;
+                return CopyFile(source, destination, overwrite);
             }
             else if (Directory.Exists(source))
             {
-                var copyResult = ValidateAndPrepareDirectories(source, destination, hard);
-                if (copyResult == (true, true))
-                {
-                    StartCoroutine(CopyDirectoryAsync(source, destination));
-                }
-                return copyResult;
+                return CopyDirectory(source, destination, overwrite);
             }
+
             return (false, false);
         }
-        private void CopyFile(string sourceFile, string destination)
+        private string FormatSizeReadable(float size)
         {
-            string targetFilePath = Path.Combine(destination, Path.GetFileName(sourceFile));
-            StartCoroutine(CopyFileAsync(sourceFile, targetFilePath));
+            var readableSize = Utils.ByteConverter.GetReadableSize((long)size);
+            return $"{readableSize.size:F2} {readableSize.unit}";
         }
-        private IEnumerator CopyFileAsync(string sourceFile, string targetFilePath)
+        private (bool, bool) CopyFile(string source, string destination, bool overwrite)
         {
-            Debug.Log("File copy started...");
-            long fileLength = new FileInfo(sourceFile).Length;
-            long totalBytesCopied = 0;
-            TotalSize = fileLength; // Set the total size for the file
+            string destinationFilePath = Path.Combine(destination, Path.GetFileName(source));
+            var validationResult = ValidateAndPreparePaths(source, destination, overwrite);
 
-            int bufferSize = 1024 * 1024;
-            using (FileStream sourceStream = new(sourceFile, FileMode.Open, FileAccess.Read))
-            using (FileStream targetStream = new(targetFilePath, FileMode.Create, FileAccess.Write))
+            if (validationResult.sourceExists && validationResult.destExists)
             {
-                byte[] buffer = new byte[bufferSize];
+                StartCoroutine(CopyFileAsync(source, destinationFilePath));
+            }
+
+            return validationResult;
+        }
+        private (bool, bool) CopyDirectory(string sourceDirectory, string destination, bool overwrite)
+        {
+            var validationResult = ValidateAndPreparePaths(sourceDirectory, destination, overwrite);
+
+            if (validationResult.sourceExists && validationResult.destExists)
+            {
+                StartCoroutine(CopyDirectoryAsync(sourceDirectory, destination));
+            }
+
+            return validationResult;
+        }
+        private (bool sourceExists, bool destExists) ValidateAndPreparePaths(string source, string destination, bool createDestination)
+        {
+            bool sourceExists = Directory.Exists(source) || File.Exists(source);
+            bool destExists = Directory.Exists(destination);
+
+            if (!sourceExists) return (false, destExists);
+
+            if (!destExists && createDestination)
+            {
+                Directory.CreateDirectory(destination);
+                destExists = true;
+            }
+
+            return (sourceExists, destExists);
+        }
+        private IEnumerator CopyFileAsync(string sourceFilePath, string destinationFilePath)
+        {
+            Debug.Log($"Starting file copy: {sourceFilePath}");
+
+            long fileLength = new FileInfo(sourceFilePath).Length;
+            TotalSize = fileLength;
+            long totalBytesCopied = 0;
+
+            using (FileStream sourceStream = new(sourceFilePath, FileMode.Open, FileAccess.Read, FileShare.Read))
+            using (FileStream destinationStream = new(destinationFilePath, FileMode.Create, FileAccess.Write, FileShare.None))
+            {
                 int bytesRead;
                 while ((bytesRead = sourceStream.Read(buffer, 0, buffer.Length)) > 0)
                 {
-                    targetStream.Write(buffer, 0, bytesRead);
+                    destinationStream.Write(buffer, 0, bytesRead);
                     totalBytesCopied += bytesRead;
-                    CurrentSize = totalBytesCopied; // Update current size
-                    PercentageProgress = totalBytesCopied / TotalSize; // Update progress
 
-                    yield return null;
+                    CurrentSize = totalBytesCopied;
+                    PercentageProgress = totalBytesCopied / TotalSize;
+
+                    yield return null; // Wait for the next frame to continue
                 }
             }
-            Debug.Log("File copied successfully.");
-        }
-        private IEnumerator CopyDirectoryAsync(string sourceDirectory, string destination)
-        {
-            Debug.Log("Directory copy started...");
 
-            TotalSize = GetDirectorySize(sourceDirectory); // Set total size for directory
+            Debug.Log("File copy completed.");
+        }
+        private IEnumerator CopyDirectoryAsync(string sourceDirectory, string destinationDirectory)
+        {
+            Debug.Log($"Starting directory copy: {sourceDirectory}");
+
+            long totalDirectorySize = GetDirectorySize(sourceDirectory);
+            TotalSize = totalDirectorySize;
             long totalBytesCopied = 0;
 
-            Task copyTask = Task.Run(() => CopyDirectory(sourceDirectory, destination, ref totalBytesCopied));
-
-            while (!copyTask.IsCompleted)
+            Task directoryCopyTask = Task.Run(() =>
             {
-                CurrentSize = totalBytesCopied; // Update current size during copy
-                PercentageProgress = totalBytesCopied / TotalSize; // Update progress
+                CopyDirectoryWithProgress(sourceDirectory, destinationDirectory, ref totalBytesCopied);
+            });
+
+            while (!directoryCopyTask.IsCompleted)
+            {
+                CurrentSize = totalBytesCopied;
+                PercentageProgress = totalBytesCopied / TotalSize;
                 yield return null;
             }
 
-            if (copyTask.IsFaulted)
+            if (directoryCopyTask.IsFaulted)
             {
-                Debug.LogError("Error during directory copy: " + copyTask.Exception);
+                Debug.LogError($"Error during directory copy: {directoryCopyTask.Exception}");
             }
             else
             {
-                Debug.Log("Directory copied successfully.");
+                Debug.Log("Directory copy completed.");
             }
         }
-        private void CopyDirectory(string sourceDirectory, string destination, ref long totalBytesCopied)
+        private void CopyDirectoryWithProgress(string sourceDirectory, string destinationDirectory, ref long totalBytesCopied)
         {
-            string newDestinationDir = Path.Combine(destination, Path.GetFileName(sourceDirectory));
+            string newDestinationDir = Path.Combine(destinationDirectory, Path.GetFileName(sourceDirectory));
             Directory.CreateDirectory(newDestinationDir);
 
-            foreach (var file in Directory.GetFiles(sourceDirectory))
+            foreach (string file in Directory.GetFiles(sourceDirectory))
             {
                 string targetFilePath = Path.Combine(newDestinationDir, Path.GetFileName(file));
                 CopyFileWithProgress(file, targetFilePath, ref totalBytesCopied);
             }
 
-            foreach (var subDir in Directory.GetDirectories(sourceDirectory))
+            foreach (string subDirectory in Directory.GetDirectories(sourceDirectory))
             {
-                CopyDirectory(subDir, newDestinationDir, ref totalBytesCopied);
+                CopyDirectoryWithProgress(subDirectory, newDestinationDir, ref totalBytesCopied);
             }
         }
         private void CopyFileWithProgress(string sourceFile, string destinationFile, ref long totalBytesCopied)
         {
-            int bufferSize = 1024 * 1024;
-            byte[] buffer = new byte[bufferSize];
-            int bytesRead;
-
-            using (FileStream sourceStream = new(sourceFile, FileMode.Open, FileAccess.Read))
-            using (FileStream targetStream = new(destinationFile, FileMode.Create, FileAccess.Write))
+            using (FileStream sourceStream = new(sourceFile, FileMode.Open, FileAccess.Read, FileShare.Read))
+            using (FileStream destinationStream = new(destinationFile, FileMode.Create, FileAccess.Write, FileShare.None))
             {
+                int bytesRead;
                 while ((bytesRead = sourceStream.Read(buffer, 0, buffer.Length)) > 0)
                 {
-                    targetStream.Write(buffer, 0, bytesRead);
+                    destinationStream.Write(buffer, 0, bytesRead);
                     totalBytesCopied += bytesRead;
 
                     CurrentSize = totalBytesCopied;
@@ -182,58 +216,8 @@ namespace Assets.PaperGameforge.Terminal.UI.CustomSliders
         }
         private long GetDirectorySize(string directory)
         {
-            long size = 0;
-            foreach (var file in Directory.GetFiles(directory, "*", SearchOption.AllDirectories))
-            {
-                size += new FileInfo(file).Length;
-            }
-            return size;
-        }
-        private (bool sourceExists, bool destExists) ValidateAndPrepareFile(string sourceFile, string destination, bool hard)
-        {
-            // Check if the source file exists
-            if (!File.Exists(sourceFile))
-            {
-                return (false, true); // Source file does not exist
-            }
-
-            // Check if the destination directory exists and create it if it does not
-            if (!Directory.Exists(destination))
-            {
-                if (hard)
-                {
-                    Directory.CreateDirectory(destination);
-                }
-                else
-                {
-                    return (true, false); // Destination directory does not exist
-                }
-            }
-
-            return (true, true);
-        }
-        private (bool sourceExists, bool destExists) ValidateAndPrepareDirectories(string sourceDirectory, string destination, bool hard)
-        {
-            // Check if the source directory exists
-            if (!Directory.Exists(sourceDirectory))
-            {
-                return (false, true); // Source directory does not exist
-            }
-
-            // Check if the destination directory exists and create it if it does not
-            if (!Directory.Exists(destination))
-            {
-                if (hard)
-                {
-                    Directory.CreateDirectory(destination);
-                }
-                else
-                {
-                    return (true, false); // Destination directory does not exist
-                }
-            }
-
-            return (true, true);
+            return Directory.GetFiles(directory, "*", SearchOption.AllDirectories)
+                            .Sum(file => new FileInfo(file).Length);
         }
         #endregion
     }
