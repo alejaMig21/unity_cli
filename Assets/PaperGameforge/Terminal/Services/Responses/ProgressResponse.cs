@@ -43,7 +43,7 @@ namespace Assets.PaperGameforge.Terminal.Services.Responses
                 var lastData = scroller.GetData(lastIndex) as TerminalData;
                 if (lastData != null)
                 {
-                    lastData.DataText = textBar.GenerateText() + " " + copier.CurrentSize + "/" + copier.TotalSize + " MB" + " SPEED " + " TIME";
+                    lastData.DataText = textBar.GenerateText() + $" {copier.CurrentSizeReadable}/{copier.TotalSizeReadable} SPEED TIME";
                 }
                 scroller.UpdateData(lastData);
 

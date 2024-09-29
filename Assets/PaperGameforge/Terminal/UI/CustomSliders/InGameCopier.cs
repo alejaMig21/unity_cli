@@ -22,19 +22,21 @@ namespace Assets.PaperGameforge.Terminal.UI.CustomSliders
             get => percentageProgress;
             private set
             {
-                percentageProgress = Mathf.Clamp01(value / 1000000);
+                percentageProgress = Mathf.Clamp01(value);
                 // Here you can update UI elements, for example:
                 //Debug.Log($"Progress: {percentageProgress * 100}%");
             }
         }
+        public string CurrentSizeReadable { get; private set; }
+        public string TotalSizeReadable { get; private set; }
         public float CurrentSize
         {
             get => currentSize;
             private set
             {
                 currentSize = value;
-                currentSize /= (1024f * 1024f); // MB
-                //Debug.Log($"Current Size: {currentSize / (1024f * 1024f):F2} MB");
+                var readableSize = Utils.ByteConverter.GetReadableSize((long)currentSize);
+                CurrentSizeReadable = $"{readableSize.size:F2} {readableSize.unit}";
             }
         }
         public float TotalSize
@@ -45,8 +47,8 @@ namespace Assets.PaperGameforge.Terminal.UI.CustomSliders
                 if (value > 0f)
                 {
                     totalSize = value;
-                    totalSize /= (1024f * 1024f); // MB
-                    //Debug.Log($"Total Size: {totalSize / (1024f * 1024f):F2} MB");
+                    var readableSize = Utils.ByteConverter.GetReadableSize((long)totalSize);
+                    TotalSizeReadable = $"{readableSize.size:F2} {readableSize.unit}";
                 }
             }
         }
@@ -172,6 +174,9 @@ namespace Assets.PaperGameforge.Terminal.UI.CustomSliders
                 {
                     targetStream.Write(buffer, 0, bytesRead);
                     totalBytesCopied += bytesRead;
+
+                    CurrentSize = totalBytesCopied;
+                    PercentageProgress = totalBytesCopied / TotalSize;
                 }
             }
         }
