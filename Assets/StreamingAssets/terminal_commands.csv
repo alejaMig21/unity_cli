@@ -23,3 +23,4 @@ cd,,,,,,,,,,,,,,,,,,[ERROR]:A directory must be specified after the change direc
 ,dir,,,,,,,,,,,,,,,,,<IMETHOD>:LoadFolders
 ,,all,,,,,,,,,,,,,,,,<IMETHOD>:LoadDirectories
 close,,,,,,,,,,,,,,,,,,<DMETHOD>:CloseTerminal
+test,testing,,,,,,,,,,,,,,,,,Successful test!

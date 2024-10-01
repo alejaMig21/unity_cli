@@ -46,6 +46,16 @@ namespace Assets.PaperGameforge.Utils
 
             return rows;
         }
+        /// <summary>
+        /// Reads a CSV file and returns its contents as a 2D array of strings, organized by columns.
+        /// </summary>
+        /// <param name="fileName">The name of the CSV file to be read.</param>
+        /// <returns>A 2D array of strings containing the CSV data, or an empty array if an error occurs.</returns>
+        /// <exception cref="ArgumentNullException">Thrown when the file name is null.</exception>
+        /// <exception cref="FileNotFoundException">Thrown when the specified file does not exist.</exception>
+        /// <exception cref="UnauthorizedAccessException">Thrown when the caller does not have the required permission.</exception>
+        /// <exception cref="IOException">Thrown when an I/O error occurs.</exception>
+        /// <exception cref="CsvHelperException">Thrown when an error occurs while reading the CSV file.</exception>
         public static string[,] ReadCsvByColumns(string fileName)
         {
             try
@@ -58,7 +68,7 @@ namespace Assets.PaperGameforge.Utils
                     csv.ReadHeader();
                     int numCols = csv.HeaderRecord.Length;
 
-                    // Leer los registros del CSV
+                    // Read CSV records
                     var records = new List<string[]>();
                     while (csv.Read())
                     {
@@ -73,7 +83,7 @@ namespace Assets.PaperGameforge.Utils
                     int numRows = records.Count;
                     string[,] result = new string[numRows, numCols];
 
-                    // Agregar las filas a la matriz resultante
+                    // Add rows to matrix
                     for (int i = 0; i < numRows; i++)
                     {
                         for (int j = 0; j < numCols; j++)
@@ -88,7 +98,7 @@ namespace Assets.PaperGameforge.Utils
             catch (Exception ex)
             {
                 Debug.LogError($"Error reading CSV file: {ex.Message}");
-                return new string[0, 0]; // Devuelve un arreglo vacío en caso de error
+                return new string[0, 0]; // Empty array in error case
             }
         }
         /// <summary>

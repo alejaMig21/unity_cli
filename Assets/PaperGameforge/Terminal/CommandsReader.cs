@@ -1,4 +1,6 @@
-﻿using Assets.PaperGameforge.Utils;
+﻿using Assets.PaperGameforge.Terminal.Commands;
+using Assets.PaperGameforge.Utils;
+using Assets.PaperGameforge.Utils.GenericTree;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -11,6 +13,7 @@ namespace Assets.PaperGameforge.Terminal
         private const string FILE_NAME = "terminal_commands.csv";
         private const string NOT_FOUND_COMMAND = "ERROR NOT_FOUND";
         private static string[,] commands = null;
+        private static List<CommandTree> commandsTree = null;
 
         public static string[,] Commands
         {
@@ -24,106 +27,204 @@ namespace Assets.PaperGameforge.Terminal
                 return commands;
             }
         }
+        public static List<CommandTree> CommandsTrees
+        {
+            get
+            {
+                if (commandsTree == null)
+                {
+                    var matrix = Commands;
 
+                    commandsTree = BuildTrees();
+                }
+                return commandsTree;
+            }
+        }
         /// <summary>
-        /// Método para cargar y organizar los comandos a partir del CSV
+        /// Builds a list of command trees from a predefined command matrix.
         /// </summary>
-        /// <param name="command"></param>
-        /// <returns>Tuple with the responses and a bool with a possible error triggered on the responses search</returns>
+        /// <returns>A list of <see cref="CommandTree"/> objects representing the command trees.</returns>
+        /// <exception cref="ArgumentNullException">Thrown when the command matrix is null.</exception>
+        /// <exception cref="InvalidOperationException">Thrown when the command matrix is improperly formatted.</exception>
+        public static List<CommandTree> BuildTrees()
+        {
+            // Initialize a list to hold the command trees and a dictionary to track nodes
+            List<CommandTree> trees = new();
+            Dictionary<string, ArgNode> nodeDict = new();
+
+            // Get the number of rows and columns in the Commands array
+            int rows = Commands.GetLength(0);
+            int cols = Commands.GetLength(1);
+
+            // Iterate through each column from the last to the first
+            for (int col = cols - 1; col >= 0; col--)
+            {
+                // Iterate through each row
+                for (int row = 0; row < rows; row++)
+                {
+                    string value = Commands[row, col];
+                    // Skip empty values
+                    if (!string.IsNullOrEmpty(value))
+                    {
+                        ArgNode currentNode;
+                        // Create an Answer node for leaves (last column)
+                        if (col == cols - 1)
+                        {
+                            currentNode = new Answer(value);
+                        }
+                        else
+                        {
+                            // If the node does not exist, create a new ArgNode and add it to the dictionary
+                            if (!nodeDict.ContainsKey(value))
+                            {
+                                nodeDict[value] = new ArgNode(value);
+                            }
+                            currentNode = nodeDict[value];
+                        }
+
+                        // If it's the first column, create a new CommandTree and add it to the list
+                        if (col == 0)
+                        {
+                            CommandTree tree = new(value);
+                            tree.Root = currentNode;
+                            trees.Add(tree);
+                        }
+                        else
+                        {
+                            bool parentFound = false;
+                            // Search for a parent node in the previous columns of the same row
+                            for (int parentCol = col - 1; parentCol >= 0; parentCol--)
+                            {
+                                string parentValue = Commands[row, parentCol];
+                                if (!string.IsNullOrEmpty(parentValue))
+                                {
+                                    if (!nodeDict.ContainsKey(parentValue))
+                                    {
+                                        nodeDict[parentValue] = new ArgNode(parentValue);
+                                    }
+
+                                    ArgNode parentNode = nodeDict[parentValue];
+                                    parentNode.AddChild(currentNode);
+                                    parentFound = true;
+                                    break;
+                                }
+                            }
+
+                            // If no parent node is found in the same row, search in the previous rows
+                            if (!parentFound)
+                            {
+                                for (int prevRow = row - 1; prevRow >= 0; prevRow--)
+                                {
+                                    for (int parentCol = col - 1; parentCol >= 0; parentCol--)
+                                    {
+                                        string parentValue = Commands[prevRow, parentCol];
+                                        if (!string.IsNullOrEmpty(parentValue))
+                                        {
+                                            if (!nodeDict.ContainsKey(parentValue))
+                                            {
+                                                nodeDict[parentValue] = new ArgNode(parentValue);
+                                            }
+
+                                            ArgNode parentNode = nodeDict[parentValue];
+                                            parentNode.AddChild(currentNode);
+                                            parentFound = true;
+                                            break;
+                                        }
+                                    }
+                                    if (parentFound) { break; }
+                                }
+                            }
+                        }
+
+                        // Add the current node to the dictionary if it's not already present
+                        if (!nodeDict.ContainsKey(value))
+                        {
+                            nodeDict[value] = currentNode;
+                        }
+                    }
+                }
+            }
+
+            // Return the list of command trees
+            return trees;
+        }
+        public static void PrintCommandTrees()
+        {
+            PrintCommandTrees(BuildTrees());
+        }
+        public static void PrintCommandTrees(List<CommandTree> commandTrees)
+        {
+            foreach (var tree in commandTrees)
+            {
+                Debug.Log($"Root: {tree.Root.Value}");
+                PrintNode(tree.Root, "  ");
+            }
+        }
+        private static void PrintNode(TreeNode<string> node, string indent)
+        {
+            foreach (var child in node.Children)
+            {
+                Debug.Log($"{indent}Child: {child.Value}");
+                PrintNode(child, indent + "  ");
+            }
+        }
+        /// <summary>
+        /// Processes a command string and retrieves corresponding responses from a predefined command tree structure.
+        /// </summary>
+        /// <param name="command">The command string to be processed.</param>
+        /// <returns>A tuple containing a boolean indicating if an error occurred and a list of response strings.</returns>
+        /// <exception cref="ArgumentNullException">Thrown when the command string is null.</exception>
+        /// <exception cref="ArgumentException">Thrown when the command string is empty or invalid.</exception>
         public static (bool error, List<string> responses) GetResponses(string command)
         {
             string[] args = command.Split(' ', StringSplitOptions.RemoveEmptyEntries);
             List<string> responses = new();
 
-            int rows = Commands.GetLength(0);
-            int cols = Commands.GetLength(1);
-            int currentRow;
-            int lastKeyColIndex;
-
-            if (!TryFindKeyColumnIndex(args, out currentRow, out lastKeyColIndex, out int lastKeyIndex))
+            //Traverse the tree to find the node corresponding to the command
+            ArgNode currentNode = null;
+            foreach (var tree in CommandsTrees)
             {
-                responses.AddRange(GetResponses(NOT_FOUND_COMMAND).responses);
-                return (true, responses);
-            }
-
-            responses.Add(Commands[currentRow, cols - 1]);
-
-            // Buscar respuestas consecutivas en la misma columna de la última clave encontrada
-            responses.AddRange(GetConsecutiveResponses(currentRow + 1, lastKeyColIndex, rows, cols));
-
-            return (false, responses);
-        }
-        private static bool TryFindKeyColumnIndex(string[] args, out int currentRow, out int lastKeyColIndex, out int lastKeyIndex)
-        {
-            int rows = Commands.GetLength(0);
-            int cols = Commands.GetLength(1);
-
-            currentRow = 0;
-            lastKeyColIndex = 0;
-            lastKeyIndex = -1;
-
-            for (int argIndex = 0; argIndex < args.Length; argIndex++)
-            {
-                string key = args[argIndex];
-                int colIndex = argIndex;
-
-                if (colIndex >= cols - 1)
+                if (tree.Root.Value == args[0])
                 {
-                    lastKeyIndex = cols - 1;
-                    return false;
-                }
-
-                while (currentRow < rows && (string.IsNullOrEmpty(Commands[currentRow, colIndex]) || Commands[currentRow, colIndex] != key))
-                {
-                    currentRow++;
-                }
-
-                if (currentRow >= rows || Commands[currentRow, colIndex] != key)
-                {
-                    lastKeyIndex = cols - 1;
-                    return false;
-                }
-
-                lastKeyColIndex = colIndex;
-                int nextRow = currentRow + 1;
-
-                while (nextRow < rows && !string.IsNullOrEmpty(Commands[nextRow, colIndex]) && Commands[nextRow, colIndex] == key)
-                {
-                    nextRow++;
-                }
-
-                currentRow = nextRow - 1;
-            }
-
-            return true;
-        }
-        private static List<string> GetConsecutiveResponses(int startRow, int keyColIndex, int rows, int cols)
-        {
-            List<string> responses = new();
-            int nextResponseRow = startRow;
-            bool flag = false;
-
-            while (nextResponseRow < rows && string.IsNullOrEmpty(Commands[nextResponseRow, keyColIndex]) && !flag)
-            {
-                for (int i = 0; i < cols - 1; i++)
-                {
-                    if (!string.IsNullOrEmpty(Commands[nextResponseRow, i]))
-                    {
-                        flag = true;
-                        break;
-                    }
-                }
-
-                if (flag)
-                {
+                    currentNode = tree.Root as ArgNode;
                     break;
                 }
-
-                responses.Add(Commands[nextResponseRow, cols - 1]);
-                nextResponseRow++;
             }
 
-            return responses;
+            if (currentNode != null)
+            {
+                for (int i = 1; i < args.Length; i++)
+                {
+                    var nextNode = currentNode.Children.Find(n => n.Value == args[i]) as ArgNode;
+                    if (nextNode == null)
+                    {
+                        responses.AddRange(GetResponses(NOT_FOUND_COMMAND).responses);
+                        return (true, responses);
+                    }
+                    currentNode = nextNode;
+                }
+
+                // Collect all Answer nodes from the current node
+                CollectAnswerChildren(currentNode, responses);
+            }
+
+            if (responses.Count > 0)
+            {
+                return (false, responses);
+            }
+
+            responses.AddRange(GetResponses(NOT_FOUND_COMMAND).responses);
+            return (true, responses);
+        }
+        private static void CollectAnswerChildren(ArgNode node, List<string> responses)
+        {
+            foreach (ArgNode child in node.Children)
+            {
+                if (child is Answer answerChild)
+                {
+                    responses.Add(answerChild.Value);
+                }
+            }
         }
     }
 }

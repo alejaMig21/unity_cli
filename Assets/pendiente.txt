@@ -15,5 +15,4 @@ csv_name
 }
 
 3-Poder crear entornos virtuales (sera crear nuevos CSV en blanco).
-4-Optimizar las busquedas dentro del CSV (usar un arbol).
-5-Preparar la terminal para lidiar con archivos cuyo directorio tiene denegada la inspeccion.
+4-Preparar la terminal para lidiar con archivos cuyo directorio tiene denegada la inspeccion.
