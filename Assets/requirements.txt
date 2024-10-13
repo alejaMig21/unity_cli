@@ -1,4 +1,9 @@
-UnityPackage -> NuGetForUnity.4.1.1
-	repo: https://github.com/GlitchEnzo/NuGetForUnity/releases/tag/v4.1.1
+UnityPackage
+	-> NuGetForUnity.4.1.1
+		repo: https://github.com/GlitchEnzo/NuGetForUnity/releases/tag/v4.1.1
 
-Dependency -> CsvHelper
+NuGet packages
+	-> CsvHelper
+		url: https://joshclose.github.io/CsvHelper/
+	-> Microsoft.CodeAnalysis.CSharp
+		url: https://github.com/dotnet/roslyn

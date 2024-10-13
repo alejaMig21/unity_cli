@@ -18,6 +18,8 @@ namespace Assets.PaperGameforge.Terminal.Services
 
         public override List<ServiceResponse> ProcessResponse(ServiceResponse response, string userInput = null)
         {
+            if (response == null) { return null; }
+
             string[] args = response.Text.Split(TWO_DOTS_SEPARATOR);
 
             if (args.Length > 1)

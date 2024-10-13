@@ -60,6 +60,8 @@ namespace Assets.PaperGameforge.Terminal
                     break;
                 }
             }
+
+            TerminalAPI.WorkingTerminal = this;
         }
         private void OnGUI()
         {
@@ -68,21 +70,25 @@ namespace Assets.PaperGameforge.Terminal
                 // Store user typing
                 string userInput = terminalInput.text;
 
-                // Clear the input field
-                ClearInputField();
-
-                // Instantiate a gameobject with a directory prefix
-                AddDirectoryLine(userInput);
-
-                // Add the interpretation lines.
-                AddInterpreterLines(_Interpreter.Interpret(userInput));
-
-                scroller.MoveToLastData();
-
-                HandleCopies();
-
-                ResetTerminalInput();
+                MainBehavior(userInput);
             }
+        }
+        public void MainBehavior(string userInput)
+        {
+            // Clear the input field
+            ClearInputField();
+
+            // Instantiate a gameobject with a directory prefix
+            AddDirectoryLine(userInput);
+
+            // Add the interpretation lines.
+            AddInterpreterLines(_Interpreter.Interpret(userInput));
+
+            scroller.MoveToLastData();
+
+            HandleCopies();
+
+            ResetTerminalInput();
         }
         /// <summary>
         /// Refocus the input field.
