@@ -38,7 +38,7 @@ namespace Assets.PaperGameforge.Terminal
                 this.data.UserInput = userInput;
             }
 
-            Text.text = this.data.Directory + this.data.UserInput;
+            Text.text = $"{this.data.Directory} {this.data.UserInput}";
         }
         public override void UpdateData(InfiniteScrollData scrollData)
         {

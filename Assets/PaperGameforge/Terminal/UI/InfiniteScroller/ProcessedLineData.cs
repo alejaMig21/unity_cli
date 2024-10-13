@@ -12,7 +12,7 @@ namespace Assets.PaperGameforge.Terminal.UI.InfiniteScroller
         public string Directory { get => directory; set => directory = value; }
         public string UserInput { get => userInput; set => userInput = value; }
 
-        public ProcessedLineData(string directory, string userInput) : base(directory + userInput)
+        public ProcessedLineData(string directory, string userInput) : base($"{directory} {userInput}")
         {
             this.directory = directory;
             this.userInput = userInput;
